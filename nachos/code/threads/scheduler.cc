@@ -157,7 +157,6 @@ Scheduler::Sleep (NachOSThread *thread, int wakeup)
 {
     DEBUG('t', "Putting thread %s on sleep list.\n", thread->getName());
 
-    thread->setStatus(BLOCKED);
     sleepList->SortedInsert((void *)thread, wakeup);
 }
 
