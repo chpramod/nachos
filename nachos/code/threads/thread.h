@@ -99,7 +99,6 @@ class NachOSThread {
     void CheckOverflow();   			// Check if thread has 
 						// overflowed its stack
     
-    void Sleep(int wakeup_time);
     
     void setStatus(ThreadStatus st) { status = st; }
     char* getName() { return (name); }
