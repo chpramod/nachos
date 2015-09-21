@@ -163,10 +163,9 @@ Scheduler::Sleep (NachOSThread *thread, int wakeup)
 void
 Scheduler::WakeUp(){
     if(!sleepList->IsEmpty()){
-        if(sleepList->firstElement() >= stats->totalTicks){
-            IntStatus oldLevel = interrupt->SetLevel(IntOff);
-            ReadyToRun((NachOSThread *)sleepList->Remove());
-            (void) interrupt->SetLevel(oldLevel);
+        while(!sleepList->IsEmpty() && sleepList->firstElement() <= stats->totalTicks){
+            int key;
+            ReadyToRun((NachOSThread *)sleepList->SortedRemove(&key));
         }
     }
 }

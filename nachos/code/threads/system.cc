@@ -20,7 +20,6 @@ Timer *timer;				// the hardware timer device,
 					// for invoking context switches
 
 int currPID;
-Timer *sleep_timer;
 
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;
@@ -64,18 +63,13 @@ extern void Cleanup();
 static void
 TimerInterruptHandler(int dummy)
 {
-    if (interrupt->getStatus() != IdleMode)
-	interrupt->YieldOnReturn();
+    //if (interrupt->getStatus() != IdleMode)
+	//interrupt->YieldOnReturn();
+	IntStatus oldLevel = interrupt->SetLevel(IntOff);
+	scheduler->WakeUp();
+    (void) interrupt->SetLevel(oldLevel);
 }
 
-
-//Sleep Handler for Waking Up after Sleep Syscall
-
-static void SleepHandler(int dummy)
-{
-    scheduler->WakeUp();
-    scheduler->Print();
-}
 
 //----------------------------------------------------------------------
 // Initialize
@@ -151,7 +145,6 @@ Initialize(int argc, char **argv)
     //if (randomYield)				// start the timer (if needed)
 	timer = new Timer(TimerInterruptHandler, 0, randomYield);
     currPID=0;
-    sleep_timer = new Timer(SleepHandler, 0, FALSE); //Wakeup handler
     threadToBeDestroyed = NULL;
 
     // We didn't explicitly allocate the current thread we are running in.
