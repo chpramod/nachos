@@ -9,7 +9,7 @@ main()
     system_PrintString("Parent PID: ");
     system_PrintInt(system_GetPID());
     system_PrintChar('\n');
-    //x = system_Fork();
+    x = system_Fork();
     if (x == 0) {
        system_PrintString("Child PID: ");
        system_PrintInt(system_GetPID());

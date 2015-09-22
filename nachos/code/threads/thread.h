@@ -39,6 +39,7 @@
 
 #include "copyright.h"
 #include "utility.h"
+#include "list.h"
 
 #ifdef USER_PROGRAM
 #include "machine.h"
@@ -103,6 +104,12 @@ class NachOSThread {
     char* getName() { return (name); }
     void Print() { printf("%s, ", name); }
     int getPID() {return pid;}
+    int getPPID() {return ppid;}
+    
+    int setPPID(int value);
+    
+    NachOSThread* parent; //Parent of the current thread
+    List* child; // Children List of the current Thread
 
   private:
     // some of the private data for this class is listed above

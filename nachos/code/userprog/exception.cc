@@ -26,6 +26,7 @@
 #include "syscall.h"
 #include "console.h"
 #include "synch.h"
+#include "addrspace.h"
 
 #define MAX_FILENAME 100
 
@@ -53,216 +54,204 @@
 //----------------------------------------------------------------------
 static Semaphore *readAvail;
 static Semaphore *writeDone;
-static void ReadAvail(int arg) { readAvail->V(); }
-static void WriteDone(int arg) { writeDone->V(); }
 
-static void ConvertIntToHex (unsigned v, Console *console)
-{
-   unsigned x;
-   if (v == 0) return;
-   ConvertIntToHex (v/16, console);
-   x = v % 16;
-   if (x < 10) {
-      writeDone->P() ;
-      console->PutChar('0'+x);
-   }
-   else {
-      writeDone->P() ;
-      console->PutChar('a'+x-10);
-   }
+static void ReadAvail(int arg) {
+    readAvail->V();
+}
+
+static void WriteDone(int arg) {
+    writeDone->V();
+}
+
+static void ConvertIntToHex(unsigned v, Console *console) {
+    unsigned x;
+    if (v == 0) return;
+    ConvertIntToHex(v / 16, console);
+    x = v % 16;
+    if (x < 10) {
+        writeDone->P();
+        console->PutChar('0' + x);
+    } else {
+        writeDone->P();
+        console->PutChar('a' + x - 10);
+    }
 }
 
 void
-ExceptionHandler(ExceptionType which)
-{
+ExceptionHandler(ExceptionType which) {
     int type = machine->ReadRegister(2);
     int memval, vaddr, printval, tempval, exp;
-    unsigned printvalus;        // Used for printing in hex
+    unsigned printvalus; // Used for printing in hex
     if (!initializedConsoleSemaphores) {
-       readAvail = new Semaphore("read avail", 0);
-       writeDone = new Semaphore("write done", 1);
-       initializedConsoleSemaphores = true;
+        readAvail = new Semaphore("read avail", 0);
+        writeDone = new Semaphore("write done", 1);
+        initializedConsoleSemaphores = true;
     }
-    Console *console = new Console(NULL, NULL, ReadAvail, WriteDone, 0);;
+    Console *console = new Console(NULL, NULL, ReadAvail, WriteDone, 0);
+    ;
 
     if ((which == SyscallException) && (type == syscall_Halt)) {
-	DEBUG('a', "Shutdown, initiated by user program.\n");
-   	interrupt->Halt();
-    }
-    else if ((which == SyscallException) && (type == syscall_PrintInt)) {
-       printval = machine->ReadRegister(4);
-       if (printval == 0) {
-	  writeDone->P() ;
-          console->PutChar('0');
-       }
-       else {
-          if (printval < 0) {
-	     writeDone->P() ;
-             console->PutChar('-');
-             printval = -printval;
-          }
-          tempval = printval;
-          exp=1;
-          while (tempval != 0) {
-             tempval = tempval/10;
-             exp = exp*10;
-          }
-          exp = exp/10;
-          while (exp > 0) {
-	     writeDone->P() ;
-             console->PutChar('0'+(printval/exp));
-             printval = printval % exp;
-             exp = exp/10;
-          }
-       }
-       // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_PrintChar)) {
-	writeDone->P() ;
-        console->PutChar(machine->ReadRegister(4));   // echo it!
-       // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_PrintString)) {
-       vaddr = machine->ReadRegister(4);
-       machine->ReadMem(vaddr, 1, &memval);
-       while ((*(char*)&memval) != '\0') {
-	  writeDone->P() ;
-          console->PutChar(*(char*)&memval);
-          vaddr++;
-          machine->ReadMem(vaddr, 1, &memval);
-       }
-       // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_PrintIntHex)) {
-       printvalus = (unsigned)machine->ReadRegister(4);
-       writeDone->P() ;
-       console->PutChar('0');
-       writeDone->P() ;
-       console->PutChar('x');
-       if (printvalus == 0) {
-          writeDone->P() ;
-          console->PutChar('0');
-       }
-       else {
-          ConvertIntToHex (printvalus, console);
-       }
-       // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_GetPA)) {
-      int phyaddr;
-      ExceptionType ans = machine->Translate((unsigned)machine->ReadRegister(4),&phyaddr,4,false);
-      if(ans==AddressErrorException || ans==PageFaultException || ans==BusErrorException) machine->WriteRegister(2,-1);
-      machine->WriteRegister(2,phyaddr);
-      // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_GetReg)) {
-      printvalus = (unsigned)machine->ReadRegister((unsigned)machine->ReadRegister(4));
-      machine->WriteRegister(2,printvalus);
-      // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_NumInstr)) {
-      printvalus = stats->userTicks;
-      machine->WriteRegister(2,printvalus);
-      // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_Time)) {
-      printvalus = (unsigned)stats->totalTicks;
-      machine->WriteRegister(2,printvalus);
-      // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_Yield)) {
-      // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-        currentThread->YieldCPU();
-    }
-    else if ((which == SyscallException) && (type == syscall_GetPID)) {
-       machine->WriteRegister(2,currentThread->getPID());
-      // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_GetPPID)) {
-       machine->WriteRegister(2,currentThread->getPID());
-      // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_Sleep)) {
-        int times = (unsigned)machine->ReadRegister(4);
-        DEBUG('t', "Sleep Entry.\n");
-        if(times==0){
-          IntStatus oldLevel = interrupt->SetLevel(IntOff);
-          currentThread->YieldCPU();
-          (void) interrupt->SetLevel(oldLevel);
+        DEBUG('a', "Shutdown, initiated by user program.\n");
+        interrupt->Halt();
+    } else if ((which == SyscallException) && (type == syscall_PrintInt)) {
+        printval = machine->ReadRegister(4);
+        if (printval == 0) {
+            writeDone->P();
+            console->PutChar('0');
+        } else {
+            if (printval < 0) {
+                writeDone->P();
+                console->PutChar('-');
+                printval = -printval;
+            }
+            tempval = printval;
+            exp = 1;
+            while (tempval != 0) {
+                tempval = tempval / 10;
+                exp = exp * 10;
+            }
+            exp = exp / 10;
+            while (exp > 0) {
+                writeDone->P();
+                console->PutChar('0' + (printval / exp));
+                printval = printval % exp;
+                exp = exp / 10;
+            }
         }
-        else{
-          scheduler->Sleep(currentThread, times + stats->totalTicks);
-          IntStatus oldLevel = interrupt->SetLevel(IntOff);
-          currentThread->PutThreadToSleep();
-          (void) interrupt->SetLevel(oldLevel);
-        }
-        DEBUG('t', "Sleep Exit.\n");
-      // Advance program counters.
-       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    }
-    else if ((which == SyscallException) && (type == syscall_Exec)) {
-        char filename[MAX_FILENAME+1];
-        int i=0;
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_PrintChar)) {
+        writeDone->P();
+        console->PutChar(machine->ReadRegister(4)); // echo it!
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_PrintString)) {
         vaddr = machine->ReadRegister(4);
         machine->ReadMem(vaddr, 1, &memval);
-        while ((*(char*)&memval) != '\0') {
-            if(i == MAX_FILENAME){
+        while ((*(char*) &memval) != '\0') {
+            writeDone->P();
+            console->PutChar(*(char*) &memval);
+            vaddr++;
+            machine->ReadMem(vaddr, 1, &memval);
+        }
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_PrintIntHex)) {
+        printvalus = (unsigned) machine->ReadRegister(4);
+        writeDone->P();
+        console->PutChar('0');
+        writeDone->P();
+        console->PutChar('x');
+        if (printvalus == 0) {
+            writeDone->P();
+            console->PutChar('0');
+        } else {
+            ConvertIntToHex(printvalus, console);
+        }
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_GetPA)) {
+        int phyaddr;
+        ExceptionType ans = machine->Translate((unsigned) machine->ReadRegister(4), &phyaddr, 4, false);
+        if (ans == AddressErrorException || ans == PageFaultException || ans == BusErrorException) machine->WriteRegister(2, -1);
+        machine->WriteRegister(2, phyaddr);
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_GetReg)) {
+        printvalus = (unsigned) machine->ReadRegister((unsigned) machine->ReadRegister(4));
+        machine->WriteRegister(2, printvalus);
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_NumInstr)) {
+        printvalus = stats->userTicks;
+        machine->WriteRegister(2, printvalus);
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_Time)) {
+        printvalus = (unsigned) stats->totalTicks;
+        machine->WriteRegister(2, printvalus);
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_Yield)) {
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+        currentThread->YieldCPU();
+    } else if ((which == SyscallException) && (type == syscall_GetPID)) {
+        machine->WriteRegister(2, currentThread->getPID());
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_GetPPID)) {
+        machine->WriteRegister(2, currentThread->getPPID());
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_Sleep)) {
+        int times = (unsigned) machine->ReadRegister(4);
+        DEBUG('t', "Sleep Entry.\n");
+        if (times == 0) {
+            IntStatus oldLevel = interrupt->SetLevel(IntOff);
+            currentThread->YieldCPU();
+            (void) interrupt->SetLevel(oldLevel);
+        } else {
+            scheduler->Sleep(currentThread, times + stats->totalTicks);
+            IntStatus oldLevel = interrupt->SetLevel(IntOff);
+            currentThread->PutThreadToSleep();
+            (void) interrupt->SetLevel(oldLevel);
+        }
+        DEBUG('t', "Sleep Exit.\n");
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    } else if ((which == SyscallException) && (type == syscall_Exec)) {
+        char filename[MAX_FILENAME + 1];
+        int i = 0;
+        vaddr = machine->ReadRegister(4);
+        machine->ReadMem(vaddr, 1, &memval);
+        while ((*(char*) &memval) != '\0') {
+            if (i == MAX_FILENAME) {
                 printf("Filename exceeds %d characters", MAX_FILENAME);
                 // Advance program counters.
                 machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
                 machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-                machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-        
+                machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+
                 return;
             }
-            filename[i] = *(char*)&memval;
+            filename[i] = *(char*) &memval;
             i++;
             vaddr++;
             machine->ReadMem(vaddr, 1, &memval);
         }
-        if(i == MAX_FILENAME+1){
-                printf("Filename exceeds %d characters", MAX_FILENAME);
-                // Advance program counters.
-                machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-                machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-                machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-        
-                return;
+        if (i == MAX_FILENAME + 1) {
+            printf("Filename exceeds %d characters", MAX_FILENAME);
+            // Advance program counters.
+            machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+            machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+            machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+
+            return;
         }
         filename[i] = '\0';
         OpenFile *executable = fileSystem->Open(filename);
@@ -273,27 +262,53 @@ ExceptionHandler(ExceptionType which)
             // Advance program counters.
             machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
             machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-            machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-        
+            machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+
             return;
         }
-        
-        space = new AddrSpace(executable);    
+
+        space = new AddrSpace(executable);
         currentThread->space = space;
-        
-        delete executable;			// close file
 
-        space->InitRegisters();		// set the initial register values
-        space->RestoreState();		// load page table register
+        delete executable; // close file
 
-        machine->Run();			// jump to the user progam
-        ASSERT(FALSE);			// machine->Run never returns;
-                                            // the address space exits
-                                            // by doing the syscall "exit"
+        space->InitRegisters(); // set the initial register values
+        space->RestoreState(); // load page table register
+
+        machine->Run(); // jump to the user progam
+        ASSERT(FALSE); // machine->Run never returns;
+        // the address space exits
+        // by doing the syscall "exit"
+
+    } else if ((which == SyscallException) && (type == syscall_Fork)) {
+        NachOSThread* fork_child;
+        fork_child = new NachOSThread("child");
+        fork_child->setStatus(READY);
+        fork_child->parent = currentThread;
+        fork_child->setPPID(currentThread->getPID());
+        currentThread->child->Append((void*) fork_child);
+
+        AddrSpace* space;
+        IntStatus oldLevel = interrupt->SetLevel(IntOff);
+        space = new AddrSpace(NULL,true);
+        (void) interrupt->SetLevel(oldLevel);
+        fork_child->space = space;
+
+        machine->WriteRegister(2, 0);
+        fork_child->SaveUserState();
+        machine->WriteRegister(2, fork_child->getPID());
+
+        oldLevel = interrupt->SetLevel(IntOff);
+        scheduler->ReadyToRun(fork_child);
+        (void) interrupt->SetLevel(oldLevel);
         
-    }
-    else {
-    	printf("Unexpected user mode exception %d %d\n", which, type);
-    	ASSERT(FALSE);
+        // Advance program counters.
+            machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+            machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+            machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+
+    } else {
+        printf("Unexpected user mode exception %d %d\n", which, type);
+        ASSERT(FALSE);
     }
 }

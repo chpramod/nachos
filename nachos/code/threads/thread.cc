@@ -39,6 +39,9 @@ NachOSThread::NachOSThread(char* threadName)
     stack = NULL;
     status = JUST_CREATED;
     pid = ++currPID;
+    ppid=0;
+    parent = NULL;
+    child = new List;
 #ifdef USER_PROGRAM
     space = NULL;
 #endif
@@ -224,6 +227,10 @@ NachOSThread::PutThreadToSleep ()
 	interrupt->Idle();	// no one to run, wait for an interrupt
         
     scheduler->Run(nextThread); // returns when we've been signalled
+}
+
+int NachOSThread::setPPID(int value){
+    this->ppid = value;
 }
 
 //----------------------------------------------------------------------
