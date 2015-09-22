@@ -284,16 +284,6 @@ NachOSThread::ThreadStackAllocate (VoidFunctionPtr func, int arg)
     machineState[WhenDonePCState] = (int) ThreadFinish;
 }
 
-// Sleep
-void
-NachOSThread::Sleep (int wakeup_time)
-{           
-    IntStatus oldLevel = interrupt->SetLevel(IntOff);
-    scheduler->Sleep(currentThread, wakeup_time);
-    PutThreadToSleep();
-    (void) interrupt->SetLevel(oldLevel);
-}
-
 #ifdef USER_PROGRAM
 #include "machine.h"
 

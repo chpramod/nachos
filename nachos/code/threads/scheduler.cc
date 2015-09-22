@@ -162,10 +162,12 @@ Scheduler::Sleep (NachOSThread *thread, int wakeup)
 
 void
 Scheduler::WakeUp(){
-    if(!sleepList->IsEmpty()){
-        while(!sleepList->IsEmpty() && sleepList->firstElement() <= stats->totalTicks){
-            int key;
-            ReadyToRun((NachOSThread *)sleepList->SortedRemove(&key));
+    if(!(sleepList->IsEmpty())){
+    	bool empty = false;
+    	int* key;
+        while(!empty && sleepList->firstElement() <= stats->totalTicks){
+            ReadyToRun((NachOSThread *)sleepList->SortedRemove(key));
+            empty = sleepList->IsEmpty();
         }
     }
 }

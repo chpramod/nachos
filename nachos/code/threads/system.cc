@@ -63,13 +63,13 @@ extern void Cleanup();
 static void
 TimerInterruptHandler(int dummy)
 {
-    //if (interrupt->getStatus() != IdleMode)
-	//interrupt->YieldOnReturn();
-	IntStatus oldLevel = interrupt->SetLevel(IntOff);
-	scheduler->WakeUp();
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);
+    scheduler->WakeUp();
+    scheduler->Print();
     (void) interrupt->SetLevel(oldLevel);
+    if (interrupt->getStatus() != IdleMode)
+	interrupt->YieldOnReturn();
 }
-
 
 //----------------------------------------------------------------------
 // Initialize
@@ -198,7 +198,6 @@ Cleanup()
 #endif
     
     delete timer;
-    delete sleep_timer;
     delete scheduler;
     delete interrupt;
     

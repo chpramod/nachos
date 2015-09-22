@@ -19,7 +19,7 @@ main()
     system_PrintInt(system_GetTime());
     system_PrintChar('\n');
     
-    system_Sleep(400);
+    //system_Sleep(100);
     
     system_PrintString("Current Thread PID: ");
     system_PrintInt(system_GetPID());
