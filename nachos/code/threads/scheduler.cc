@@ -164,9 +164,8 @@ void
 Scheduler::WakeUp(){
     if(!(sleepList->IsEmpty())){
     	bool empty = false;
-    	int* key;
         while(!empty && sleepList->firstElement() <= stats->totalTicks){
-            ReadyToRun((NachOSThread *)sleepList->SortedRemove(key));
+            ReadyToRun((NachOSThread *)sleepList->Remove());
             empty = sleepList->IsEmpty();
         }
     }

@@ -65,7 +65,7 @@ TimerInterruptHandler(int dummy)
 {
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
     scheduler->WakeUp();
-    scheduler->Print();
+    //scheduler->Print();
     (void) interrupt->SetLevel(oldLevel);
     if (interrupt->getStatus() != IdleMode)
 	interrupt->YieldOnReturn();

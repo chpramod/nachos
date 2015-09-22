@@ -27,6 +27,8 @@
 #include "console.h"
 #include "synch.h"
 
+#define MAX_FILENAME 100
+
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -232,6 +234,63 @@ ExceptionHandler(ExceptionType which)
        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if ((which == SyscallException) && (type == syscall_Exec)) {
+        char filename[MAX_FILENAME+1];
+        int i=0;
+        vaddr = machine->ReadRegister(4);
+        machine->ReadMem(vaddr, 1, &memval);
+        while ((*(char*)&memval) != '\0') {
+            if(i == MAX_FILENAME){
+                printf("Filename exceeds %d characters", MAX_FILENAME);
+                // Advance program counters.
+                machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+                machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+                machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+        
+                return;
+            }
+            filename[i] = *(char*)&memval;
+            i++;
+            vaddr++;
+            machine->ReadMem(vaddr, 1, &memval);
+        }
+        if(i == MAX_FILENAME+1){
+                printf("Filename exceeds %d characters", MAX_FILENAME);
+                // Advance program counters.
+                machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+                machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+                machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+        
+                return;
+        }
+        filename[i] = '\0';
+        OpenFile *executable = fileSystem->Open(filename);
+        AddrSpace *space;
+
+        if (executable == NULL) {
+            printf("Unable to open file %s\n", filename);
+            // Advance program counters.
+            machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+            machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+            machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+        
+            return;
+        }
+        
+        space = new AddrSpace(executable);    
+        currentThread->space = space;
+        
+        delete executable;			// close file
+
+        space->InitRegisters();		// set the initial register values
+        space->RestoreState();		// load page table register
+
+        machine->Run();			// jump to the user progam
+        ASSERT(FALSE);			// machine->Run never returns;
+                                            // the address space exits
+                                            // by doing the syscall "exit"
+        
     }
     else {
     	printf("Unexpected user mode exception %d %d\n", which, type);

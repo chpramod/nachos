@@ -18,8 +18,11 @@ main()
     system_PrintString("Current Clock Ticks: ");
     system_PrintInt(system_GetTime());
     system_PrintChar('\n');
+    system_PrintString("Register value at 4: ");
+    system_PrintInt(system_GetReg(4));
+    system_PrintChar('\n');
     
-    system_Sleep(400);
+    system_Sleep(10000000);
     
     system_PrintString("Current Thread PID: ");
     system_PrintInt(system_GetPID());
