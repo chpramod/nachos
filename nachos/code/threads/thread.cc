@@ -24,6 +24,7 @@
 					// execution stack, for detecting 
 					// stack overflows
 extern int currPID; // PID variable
+int totalThreads = 0;
 //----------------------------------------------------------------------
 // NachOSThread::NachOSThread
 // 	Initialize a thread control block, so that we can then call
@@ -42,6 +43,7 @@ NachOSThread::NachOSThread(char* threadName)
     ppid=0;
     parent = NULL;
     child = new List;
+    totalThreads++;
 #ifdef USER_PROGRAM
     space = NULL;
 #endif

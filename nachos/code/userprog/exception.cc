@@ -317,7 +317,15 @@ ExceptionHandler(ExceptionType which) {
     }
     else if ((which == SyscallException) && (type == syscall_Exit)) {
         
+        int exitstatus = machine->ReadRegister(4);
         
+        extern int totalThreads;
+        if(totalThreads==0) interrupt->halt();
+        
+        if(currentThread->parent!=NULL){
+            
+        }
+        currentThread->FinishThread();
         // Advance program counters.
             machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
             machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));

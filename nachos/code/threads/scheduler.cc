@@ -126,6 +126,8 @@ Scheduler::Run (NachOSThread *nextThread)
     if (threadToBeDestroyed != NULL) {
         delete threadToBeDestroyed;
 	threadToBeDestroyed = NULL;
+        extern int totalThreads;
+        totalThreads--;
     }
     
 #ifdef USER_PROGRAM
