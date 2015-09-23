@@ -239,3 +239,19 @@ List::SortedRemove(int *keyPtr)
 int List::firstElement(){
     return first->key;
 }
+
+//search an item acc to key
+void *
+List::Search(int searchKey)
+{
+    ListElement *element = first;
+    void *thing;
+    
+    while(element!=NULL){
+        thing = element->item;
+        if(element->key==searchKey) return thing;
+        element = element->next;
+    }
+    
+}
+

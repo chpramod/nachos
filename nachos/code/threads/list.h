@@ -57,7 +57,7 @@ class List {
     // Routines to put/get items on/off list in order (sorted by key)
     void SortedInsert(void *item, int sortKey);	// Put item into list
     void *SortedRemove(int *keyPtr); 	  	// Remove first item from list
-
+    void *Search(int searchKey);                //returns element with key=searchKey
     int firstElement();
     
   private:

@@ -290,8 +290,7 @@ ExceptionHandler(ExceptionType which) {
         fork_child = new NachOSThread("child");
         fork_child->parent = currentThread;
         fork_child->setPPID(currentThread->getPID());
-        currentThread->child->Append((void*) fork_child);
-        
+        //currentThread->AppendChild(fork_child);
         AddrSpace* space;
         IntStatus oldLevel = interrupt->SetLevel(IntOff);
         space = new AddrSpace(NULL,true);
@@ -307,7 +306,6 @@ ExceptionHandler(ExceptionType which) {
     } 
     else if ((which == SyscallException) && (type == syscall_Join)) {
         int child_pid = machine->ReadRegister(4);
-        NachOSThread* child = currentThread->searchChild(child_pid);
         
         // Advance program counters.
             machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
@@ -316,15 +314,21 @@ ExceptionHandler(ExceptionType which) {
            
     }
     else if ((which == SyscallException) && (type == syscall_Exit)) {
-        
+        IntStatus oldLevel = interrupt->SetLevel(IntOff);
+        extern process* processArray;
         int exitstatus = machine->ReadRegister(4);
         
         extern int totalThreads;
-        if(totalThreads==0) interrupt->halt();
+        if(totalThreads==0) interrupt->Halt();
         
         if(currentThread->parent!=NULL){
-            
+            if(processArray[currentThread->getPID()].parentWait==PARENT_WAITING){
+                scheduler->ReadyToRun(currentThread->parent);
+            }
         }
+        processArray[currentThread->getPID()].aliveStatus=DEAD;
+        processArray[currentThread->getPID()].exitStatus=exitstatus;
+        (void) interrupt->SetLevel(oldLevel);
         currentThread->FinishThread();
         // Advance program counters.
             machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));

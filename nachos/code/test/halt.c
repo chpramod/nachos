@@ -30,6 +30,7 @@ main()
     system_PrintString("Number of Instructions: ");
     system_PrintInt(system_GetNumInstr());
     system_PrintChar('\n');
-    system_Halt();
+    system_PrintString("About to exit");
+    system_Exit(0);
     /* not reached */
 }

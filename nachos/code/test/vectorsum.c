@@ -13,6 +13,6 @@ main()
     system_PrintString("Executed instruction count: ");
     system_PrintInt(system_GetNumInstr());
     system_PrintChar('\n');
-    system_Exit(0);
+    //system_Exit(0);
     return 0;
 }

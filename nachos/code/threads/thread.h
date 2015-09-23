@@ -59,6 +59,13 @@
 
 // Thread state
 enum ThreadStatus { JUST_CREATED, RUNNING, READY, BLOCKED };
+    
+// Parent child state
+enum ChildStatus { ALIVE, DEAD };
+
+// Parent child state
+enum ParentChildStatus { PARENT_WAITING, PARENT_NOT_WAITING };
+
 
 // external function, dummy routine whose sole job is to call NachOSThread::Print
 extern void ThreadPrint(int arg);	 
@@ -80,7 +87,14 @@ class NachOSThread {
     // THEY MUST be in this position for SWITCH to work.
     int* stackTop;			 // the current stack pointer
     int machineState[MachineStateSize];  // all registers except for stackTop
-
+    /*void AppendProcess(NachOSThread* child, 
+    ChildStatus aliveStatus,
+    ParentChildStatus parentWait,
+    int exitStatus);
+    void ChangeProcess(int pid,
+    ChildStatus aliveStatus,
+    ParentChildStatus parentWait,
+    int exitStatus);*/
   public:
     NachOSThread(char* debugName);		// initialize a Thread 
     ~NachOSThread(); 				// deallocate a Thread
@@ -107,9 +121,11 @@ class NachOSThread {
     int getPPID() {return ppid;}
     
     int setPPID(int value);
+    //for exit status
     
     NachOSThread* parent; //Parent of the current thread
-    List* child; // Children List of the current Thread
+    
+    
 
   private:
     // some of the private data for this class is listed above
@@ -140,6 +156,17 @@ class NachOSThread {
     AddrSpace *space;			// User code this thread is running.
 #endif
 };
+
+struct process{
+    NachOSThread* thread;
+    ChildStatus aliveStatus;
+    ParentChildStatus parentWait;
+    int exitStatus;
+    int parentPid;
+};
+
+
+
 
 // Magical machine-dependent routines, defined in switch.s
 

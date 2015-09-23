@@ -23,8 +23,12 @@
 #define STACK_FENCEPOST 0xdeadbeef	// this is put at the top of the
 					// execution stack, for detecting 
 					// stack overflows
+
 extern int currPID; // PID variable
-int totalThreads = 0;
+
+extern int totalThreads;
+
+process processArray[32];
 //----------------------------------------------------------------------
 // NachOSThread::NachOSThread
 // 	Initialize a thread control block, so that we can then call
@@ -40,10 +44,14 @@ NachOSThread::NachOSThread(char* threadName)
     stack = NULL;
     status = JUST_CREATED;
     pid = ++currPID;
-    ppid=0;
+    ppid=-1;
     parent = NULL;
-    child = new List;
     totalThreads++;
+    processArray[pid].thread=this;
+    processArray[pid].aliveStatus=ALIVE;
+    processArray[pid].parentPid=-1;
+    processArray[pid].parentWait=PARENT_NOT_WAITING;
+    processArray[pid].exitStatus=-1;
 #ifdef USER_PROGRAM
     space = NULL;
 #endif
@@ -233,6 +241,7 @@ NachOSThread::PutThreadToSleep ()
 
 int NachOSThread::setPPID(int value){
     this->ppid = value;
+    processArray[this->pid].parentPid=value;
 }
 
 //----------------------------------------------------------------------
