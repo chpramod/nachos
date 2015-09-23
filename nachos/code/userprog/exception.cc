@@ -280,14 +280,18 @@ ExceptionHandler(ExceptionType which) {
         // the address space exits
         // by doing the syscall "exit"
 
-    } else if ((which == SyscallException) && (type == syscall_Fork)) {
+    } else if ((which == SyscallException) && (type == syscall_Fork)) {        
+        // Advance program counters.
+            machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+            machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+            machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+            
         NachOSThread* fork_child;
         fork_child = new NachOSThread("child");
-        fork_child->setStatus(READY);
         fork_child->parent = currentThread;
         fork_child->setPPID(currentThread->getPID());
         currentThread->child->Append((void*) fork_child);
-
+        
         AddrSpace* space;
         IntStatus oldLevel = interrupt->SetLevel(IntOff);
         space = new AddrSpace(NULL,true);
@@ -297,17 +301,30 @@ ExceptionHandler(ExceptionType which) {
         machine->WriteRegister(2, 0);
         fork_child->SaveUserState();
         machine->WriteRegister(2, fork_child->getPID());
-
-        oldLevel = interrupt->SetLevel(IntOff);
-        scheduler->ReadyToRun(fork_child);
-        (void) interrupt->SetLevel(oldLevel);
+        
+        fork_child->ThreadFork(&fork_start,0);
+        
+    } 
+    else if ((which == SyscallException) && (type == syscall_Join)) {
+        int child_pid = machine->ReadRegister(4);
+        NachOSThread* child = currentThread->searchChild(child_pid);
         
         // Advance program counters.
             machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
             machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
             machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
-
-    } else {
+           
+    }
+    else if ((which == SyscallException) && (type == syscall_Exit)) {
+        
+        
+        // Advance program counters.
+            machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+            machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+            machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+           
+    }   
+    else {
         printf("Unexpected user mode exception %d %d\n", which, type);
         ASSERT(FALSE);
     }

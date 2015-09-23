@@ -123,18 +123,20 @@ AddrSpace::AddrSpace(OpenFile *executable, bool fork)
     else{
         
         int i = 0;
+        
+        numPages = machine->pageTableSize;
         int size = machine->pageTableSize * PageSize;
-        ASSERT(machine->pageTableSize + totalPages <= NumPhysPages); // check we're not trying
+        //printf("Size %d %d", machine->pageTableSize, totalPages);
+        ASSERT(numPages + totalPages <= NumPhysPages); // check we're not trying
         // to run anything too big --
         // at least until we have
         // virtual memory
 
         DEBUG('a', "Initializing address space, num pages %d, size %d\n",
-                machine->pageTableSize + totalPages, size);
+                numPages + totalPages, size);
         // first, set up the translation 
-        
-        pageTable = new TranslationEntry[machine->pageTableSize];
-        for (i = 0; i < machine->pageTableSize; i++) {
+        pageTable = new TranslationEntry[numPages];
+        for (i = 0; i < numPages; i++) {
             pageTable[i].virtualPage = i; // for now, virtual page # = phys page #
             pageTable[i].physicalPage = i + totalPages;
             pageTable[i].valid = TRUE;
@@ -150,10 +152,13 @@ AddrSpace::AddrSpace(OpenFile *executable, bool fork)
         // zero out the entire address space, to zero the unitialized data segment 
         // and the stack segment
         bzero(machine->mainMemory + totalMemory, size);
-
-        memcpy((void*)(machine->mainMemory + totalMemory), (const void*)(machine->pageTable[0].physicalPage), machine->pageTableSize * PageSize);
-
-        totalPages = totalPages + machine->pageTableSize;
+        
+        memcpy((void*)(machine->mainMemory + totalMemory), (const void*)(machine->mainMemory + machine->pageTable[0].physicalPage*PageSize), machine->pageTableSize * PageSize);
+        /*for(i=0;i<size;i++){
+            printf("%c || %c \n", (machine->mainMemory + totalMemory)[i], (machine->mainMemory+machine->pageTable[0].physicalPage*PageSize)[i]);
+            //(machine->mainMemory + totalMemory)[i] = (machine->mainMemory+machine->pageTable[0].physicalPage*PageSize)[i];
+        }*/
+        totalPages = totalPages + numPages;
 
     }
 }

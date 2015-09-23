@@ -97,6 +97,7 @@
           </df>
           <df name="test">
             <in>forkjoin.c</in>
+            <in>forkjoin.s</in>
             <in>halt.c</in>
             <in>matmult.c</in>
             <in>printtest.c</in>

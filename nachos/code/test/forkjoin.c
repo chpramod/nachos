@@ -3,7 +3,7 @@
 int
 main()
 {
-    int x=0;
+    int x;
     int sleep_start, sleep_end;
 
     system_PrintString("Parent PID: ");
