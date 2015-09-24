@@ -33,6 +33,9 @@ main()
 	for (j = 0; j < Dim; j++)
             for (k = 0; k < Dim; k++)
 		 C[i][j] += A[i][k] * B[k][j];
-
+        
+        
+    system_PrintString("my value is :");
+    system_PrintInt(C[Dim-1][Dim-1]);    
     system_Exit(C[Dim-1][Dim-1]);		/* and then we're done */
 }

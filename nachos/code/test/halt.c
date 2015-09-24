@@ -22,7 +22,7 @@ main()
     system_PrintInt(system_GetReg(4));
     system_PrintChar('\n');
     
-    system_Sleep(10000000);
+    system_Sleep(100000);
     
     system_PrintString("Current Thread PID: ");
     system_PrintInt(system_GetPID());

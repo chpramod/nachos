@@ -27,8 +27,11 @@
 extern int currPID; // PID variable
 
 extern int totalThreads;
+//extern process* processArray;
 
-process processArray[32];
+//DEBUG('a', "before\n");
+//process processArray[64];
+//DEBUG('a', "after\n");
 //----------------------------------------------------------------------
 // NachOSThread::NachOSThread
 // 	Initialize a thread control block, so that we can then call
@@ -47,11 +50,16 @@ NachOSThread::NachOSThread(char* threadName)
     ppid=-1;
     parent = NULL;
     totalThreads++;
-    processArray[pid].thread=this;
-    processArray[pid].aliveStatus=ALIVE;
-    processArray[pid].parentPid=-1;
-    processArray[pid].parentWait=PARENT_NOT_WAITING;
-    processArray[pid].exitStatus=-1;
+//    processArray[pid].thread=this;
+//    processArray[pid].aliveStatus=ALIVE;
+//    processArray[pid].parentPid=-1;
+//    processArray[pid].parentWait=PARENT_NOT_WAITING;
+//    processArray[pid].exitStatus=-1;
+//    system_PrintString("status :");
+//    system_PrintInt(processArray[pid].exitStatus);
+//    system_PrintString("\n");
+    //DEBUG('a', "exitStatus %d\n",processArray[pid].exitStatus);
+    
 #ifdef USER_PROGRAM
     space = NULL;
 #endif
@@ -241,7 +249,7 @@ NachOSThread::PutThreadToSleep ()
 
 int NachOSThread::setPPID(int value){
     this->ppid = value;
-    processArray[this->pid].parentPid=value;
+    //processArray[this->pid].parentPid=value;
 }
 
 //----------------------------------------------------------------------

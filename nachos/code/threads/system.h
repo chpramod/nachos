@@ -29,6 +29,21 @@ extern Interrupt *interrupt;			// interrupt status
 extern Statistics *stats;			// performance metrics
 extern Timer *timer;				// the hardware alarm clock
 
+//// Parent child state
+//enum ChildStatus { ALIVE, DEAD };
+//
+//// Parent child state
+//enum ParentChildStatus { PARENT_WAITING, PARENT_NOT_WAITING };
+
+//struct process{
+//    NachOSThread* thread;
+//    ChildStatus aliveStatus;
+//    ParentChildStatus parentWait;
+//    int exitStatus;
+//    int parentPid;
+//};
+
+
 extern bool initializedConsoleSemaphores;       // Used to initialize the semaphores for console I/O exactly once
 
 #ifdef USER_PROGRAM

@@ -23,6 +23,9 @@ int currPID;
 
 int totalThreads = -1;
 
+//process processArray[64];
+
+
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;
 #endif

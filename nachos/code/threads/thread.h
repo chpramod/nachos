@@ -157,13 +157,13 @@ class NachOSThread {
 #endif
 };
 
-struct process{
-    NachOSThread* thread;
-    ChildStatus aliveStatus;
-    ParentChildStatus parentWait;
-    int exitStatus;
-    int parentPid;
-};
+//struct process{
+//    //NachOSThread* thread;
+//    ChildStatus aliveStatus;
+//    ParentChildStatus parentWait;
+//    int exitStatus;
+//    int parentPid;
+//};
 
 
 
