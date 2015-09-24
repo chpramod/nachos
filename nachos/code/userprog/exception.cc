@@ -309,7 +309,8 @@ ExceptionHandler(ExceptionType which) {
         currentThread->setChildStatus(PARENT_WAITING);
         
         if(currentThread->getChildStatus()==PARENT_WAITING){
-            machine->WriteRegister(2, 5);
+            extern int totalThreads;
+            machine->WriteRegister(2, totalThreads);
         }
         
         // Advance program counters.
@@ -319,18 +320,22 @@ ExceptionHandler(ExceptionType which) {
            
     }
     else if ((which == SyscallException) && (type == syscall_Exit)) {
-        IntStatus oldLevel = interrupt->SetLevel(IntOff);
+        
         //extern process* processArray;
         int exitstatus = machine->ReadRegister(4);
-        if(currentThread->parent!=NULL){
-            int thisPid = currentThread->getPID();
-            currentThread->parent->updateChildLife(thisPid);
-            //system_PrintString("Did this: \n");
-            DEBUG('t', "did This.\n");
-        }
+        
         extern int totalThreads;
         if(totalThreads==0) interrupt->Halt();
         
+        if(currentThread->parent!=NULL){
+            int thisPid = currentThread->getPID();
+            if(currentThread->getChildStatus()==PARENT_WAITING){
+                scheduler->ReadyToRun(currentThread->parent);
+            }
+            currentThread->parent->updateChildLife(thisPid,exitstatus);
+            //system_PrintString("Did this: \n");
+            //DEBUG('t', "did This.\n");
+        }
 //        if(currentThread->parent!=NULL){
 //            if(processArray[currentThread->getPID()].parentWait==PARENT_WAITING){
 //                scheduler->ReadyToRun(currentThread->parent);
@@ -338,7 +343,8 @@ ExceptionHandler(ExceptionType which) {
 //        }
         //processArray[currentThread->getPID()].aliveStatus=DEAD;
         //processArray[currentThread->getPID()].exitStatus=exitstatus;
-        (void) interrupt->SetLevel(oldLevel);
+        /*IntStatus oldLevel = interrupt->SetLevel(IntOff);
+        (void) interrupt->SetLevel(oldLevel);*/
         currentThread->FinishThread();
         // Advance program counters.
             machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));

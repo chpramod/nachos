@@ -95,6 +95,9 @@ NachOSThread::~NachOSThread()
     child = new List;
 } */
 
+
+
+
 void
 NachOSThread::addChildToList(NachOSThread* chld)
 {
@@ -109,12 +112,13 @@ NachOSThread::addChildToList(NachOSThread* chld)
 }
 
 void
-NachOSThread::updateChildLife(int childPid)
+NachOSThread::updateChildLife(int childPid, int exitValue)
 {
     childListElement *chldStruct;
     chldStruct = (childListElement *)child->Search(childPid);
     if(chldStruct!=NULL){
         chldStruct->changeChildStatus(DEAD);
+        chldStruct->changeExitVal(exitValue);
     }
 }
 

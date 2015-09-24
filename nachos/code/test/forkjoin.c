@@ -41,6 +41,7 @@ main()
        int a = system_Join(2);
        system_PrintInt(a);
        system_PrintChar('\n');
+       system_Exit(12);
         /*system_PrintString("Parent after fork waiting for child: ");
        system_PrintInt(x);
        system_PrintChar('\n');

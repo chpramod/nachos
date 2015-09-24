@@ -126,7 +126,7 @@ class NachOSThread {
     ParentChildStatus getChildStatus(){ return pcStatus;} 
     //MakeChildList();
     void addChildToList(NachOSThread* chld);
-    void updateChildLife(int childPid);
+    void updateChildLife(int childPid, int exitValue);
     
     int setPPID(int value);
     //for exit status
