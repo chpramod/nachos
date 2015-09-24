@@ -147,7 +147,7 @@ thread.o: ../threads/thread.cc ../threads/copyright.h ../threads/thread.h \
   ../threads/utility.h ../threads/switch.h ../threads/synch.h \
   ../threads/system.h ../threads/scheduler.h ../machine/interrupt.h \
   ../threads/list.h ../machine/stats.h ../machine/timer.h \
-  ../filesys/filesys.h
+  ../filesys/filesys.h ../threads/struct.h
 utility.o: ../threads/utility.cc ../threads/copyright.h \
   ../threads/utility.h ../machine/sysdep.h ../threads/copyright.h \
   /usr/include/stdio.h /usr/include/features.h /usr/include/sys/cdefs.h \

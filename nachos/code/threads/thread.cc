@@ -19,6 +19,7 @@
 #include "switch.h"
 #include "synch.h"
 #include "system.h"
+#include "struct.h"
 
 #define STACK_FENCEPOST 0xdeadbeef	// this is put at the top of the
 					// execution stack, for detecting 
@@ -48,7 +49,9 @@ NachOSThread::NachOSThread(char* threadName)
     status = JUST_CREATED;
     pid = ++currPID;
     ppid=-1;
+    pcStatus = PARENT_NOT_WAITING;
     parent = NULL;
+    child = new List;
     totalThreads++;
 //    processArray[pid].thread=this;
 //    processArray[pid].aliveStatus=ALIVE;
@@ -85,6 +88,36 @@ NachOSThread::~NachOSThread()
     if (stack != NULL)
 	DeallocBoundedArray((char *) stack, StackSize * sizeof(int));
 }
+
+//redundant
+/*NachOSThread::MakeChildList()
+{ 
+    child = new List;
+} */
+
+void
+NachOSThread::addChildToList(NachOSThread* chld)
+{
+   // DEBUG('t', "Putting thread %s on ready list.\n", thread->getName());
+//    childListElement* chldStruct;// = new childListElement;
+//    chldStruct->childThread = chld;
+//    chldStruct->childStatus = ALIVE;
+//    chldStruct->exitVal = -1;
+    childListElement *chldStruct;
+    chldStruct = new childListElement(chld,ALIVE,-1); 
+    child->AppendWithKey((void *)chldStruct, chld->getPID());
+}
+
+void
+NachOSThread::updateChildLife(int childPid)
+{
+    childListElement *chldStruct;
+    chldStruct = (childListElement *)child->Search(childPid);
+    if(chldStruct!=NULL){
+        chldStruct->changeChildStatus(DEAD);
+    }
+}
+
 
 //----------------------------------------------------------------------
 // NachOSThread::ThreadFork
@@ -247,6 +280,8 @@ NachOSThread::PutThreadToSleep ()
     scheduler->Run(nextThread); // returns when we've been signalled
 }
 
+
+//assigns parent pid
 int NachOSThread::setPPID(int value){
     this->ppid = value;
     //processArray[this->pid].parentPid=value;

@@ -290,7 +290,7 @@ ExceptionHandler(ExceptionType which) {
         fork_child = new NachOSThread("child");
         fork_child->parent = currentThread;
         fork_child->setPPID(currentThread->getPID());
-        //currentThread->AppendChild(fork_child);
+        currentThread->addChildToList(fork_child);
         AddrSpace* space;
         IntStatus oldLevel = interrupt->SetLevel(IntOff);
         space = new AddrSpace(NULL,true);
@@ -306,6 +306,11 @@ ExceptionHandler(ExceptionType which) {
     } 
     else if ((which == SyscallException) && (type == syscall_Join)) {
         int child_pid = machine->ReadRegister(4);
+        currentThread->setChildStatus(PARENT_WAITING);
+        
+        if(currentThread->getChildStatus()==PARENT_WAITING){
+            machine->WriteRegister(2, 5);
+        }
         
         // Advance program counters.
             machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
@@ -317,7 +322,12 @@ ExceptionHandler(ExceptionType which) {
         IntStatus oldLevel = interrupt->SetLevel(IntOff);
         //extern process* processArray;
         int exitstatus = machine->ReadRegister(4);
-        
+        if(currentThread->parent!=NULL){
+            int thisPid = currentThread->getPID();
+            currentThread->parent->updateChildLife(thisPid);
+            //system_PrintString("Did this: \n");
+            DEBUG('t', "did This.\n");
+        }
         extern int totalThreads;
         if(totalThreads==0) interrupt->Halt();
         

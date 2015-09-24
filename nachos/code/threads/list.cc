@@ -87,6 +87,19 @@ List::Append(void *item)
     }
 }
 
+void
+List::AppendWithKey(void *item, int itemKey)
+{
+    ListElement *element = new ListElement(item, itemKey);
+
+    if (IsEmpty()) {		// list is empty
+	first = element;
+	last = element;
+    } else {			// else put it after last
+	last->next = element;
+	last = element;
+    }
+}
 //----------------------------------------------------------------------
 // List::Prepend
 //      Put an "item" on the front of the list.
@@ -245,7 +258,7 @@ void *
 List::Search(int searchKey)
 {
     ListElement *element = first;
-    void *thing;
+    void *thing=NULL;
     
     while(element!=NULL){
         thing = element->item;

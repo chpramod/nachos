@@ -14,7 +14,7 @@ main()
        system_PrintString("my value is :");
        system_PrintInt(x);
        system_PrintChar('\n');
-       //system_Exit(0);
+       system_Exit(0);
        system_PrintString("Child PID: ");
        system_PrintInt(system_GetPID());
        system_PrintChar('\n');
@@ -37,6 +37,10 @@ main()
     }
     else {
        system_Sleep(100000);
+       system_PrintString(" join's:");
+       int a = system_Join(2);
+       system_PrintInt(a);
+       system_PrintChar('\n');
         /*system_PrintString("Parent after fork waiting for child: ");
        system_PrintInt(x);
        system_PrintChar('\n');

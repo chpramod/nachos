@@ -67,6 +67,8 @@ enum ChildStatus { ALIVE, DEAD };
 enum ParentChildStatus { PARENT_WAITING, PARENT_NOT_WAITING };
 
 
+
+
 // external function, dummy routine whose sole job is to call NachOSThread::Print
 extern void ThreadPrint(int arg);	 
 void fork_start(int dummy);
@@ -87,6 +89,7 @@ class NachOSThread {
     // THEY MUST be in this position for SWITCH to work.
     int* stackTop;			 // the current stack pointer
     int machineState[MachineStateSize];  // all registers except for stackTop
+    List *child;                         //stores all children
     /*void AppendProcess(NachOSThread* child, 
     ChildStatus aliveStatus,
     ParentChildStatus parentWait,
@@ -115,10 +118,15 @@ class NachOSThread {
 						// overflowed its stack
     
     void setStatus(ThreadStatus st) { status = st; }
+    void setChildStatus(ParentChildStatus st){ pcStatus = st; }
     char* getName() { return (name); }
     void Print() { printf("%s, ", name); }
     int getPID() {return pid;}
     int getPPID() {return ppid;}
+    ParentChildStatus getChildStatus(){ return pcStatus;} 
+    //MakeChildList();
+    void addChildToList(NachOSThread* chld);
+    void updateChildLife(int childPid);
     
     int setPPID(int value);
     //for exit status
@@ -141,6 +149,7 @@ class NachOSThread {
 					// Used internally by ThreadFork()
 
     int pid, ppid;			// My pid and my parent's pid
+    ParentChildStatus pcStatus;
 
 #ifdef USER_PROGRAM
 // A thread running a user program actually has *two* sets of CPU registers -- 
@@ -156,6 +165,7 @@ class NachOSThread {
     AddrSpace *space;			// User code this thread is running.
 #endif
 };
+
 
 //struct process{
 //    //NachOSThread* thread;
