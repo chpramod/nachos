@@ -14,7 +14,7 @@ main()
        system_PrintString("my value is :");
        system_PrintInt(x);
        system_PrintChar('\n');
-       system_Exit(0);
+       //system_Exit(0);
        system_PrintString("Child PID: ");
        system_PrintInt(system_GetPID());
        system_PrintChar('\n');
@@ -31,7 +31,7 @@ main()
        system_PrintInt(sleep_end);
        system_PrintChar('\n');
        system_PrintString("Child executed ");
-       //system_Exit(0);
+       system_Exit(5);
        system_PrintInt(system_GetNumInstr());
        system_PrintString(" instructions.\n");
     }
@@ -41,14 +41,16 @@ main()
        int a = system_Join(2);
        system_PrintInt(a);
        system_PrintChar('\n');
-       system_Exit(12);
-        /*system_PrintString("Parent after fork waiting for child: ");
+       //system_Exit(12);
+        system_PrintString("Parent after fork waiting for child: ");
        system_PrintInt(x);
        system_PrintChar('\n');
-       //system_Join(x);
-       system_PrintString("Parent executed ");
+       int y = system_Join(x);
+       system_PrintInt(y);
+       system_PrintChar('\n');
+       /*system_PrintString("Parent executed ");
        system_PrintInt(system_GetNumInstr());
-       system_PrintString(" instructions.\n");*/
+       system_PrintString(" instructions.\n")*/;
     }
     return 0;
 }

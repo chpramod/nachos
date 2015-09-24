@@ -306,12 +306,29 @@ ExceptionHandler(ExceptionType which) {
     } 
     else if ((which == SyscallException) && (type == syscall_Join)) {
         int child_pid = machine->ReadRegister(4);
-        currentThread->setChildStatus(PARENT_WAITING);
-        
-        if(currentThread->getChildStatus()==PARENT_WAITING){
-            extern int totalThreads;
-            machine->WriteRegister(2, totalThreads);
+        childListElement *chldStruct;
+        List *child;
+        child = currentThread->getChildList();
+        chldStruct = (childListElement *)child->Search(child_pid);
+        if(chldStruct!=NULL){
+            if(chldStruct->getChildStatus()==DEAD){
+                int exitVal = chldStruct->getExitVal();
+                machine->WriteRegister(2, exitVal);
+            }
+            else{
+                NachOSThread* childThread;
+                childThread = chldStruct->getChildThread();
+                childThread->setChildStatus(PARENT_WAITING);
+                currentThread->PutThreadToSleep();
+            }
         }
+        else    machine->WriteRegister(2, -1);
+//        currentThread->setChildStatus(PARENT_WAITING);
+//        
+//        if(currentThread->getChildStatus()==PARENT_WAITING){
+//            extern int totalThreads;
+//            machine->WriteRegister(2, totalThreads);
+//        }
         
         // Advance program counters.
             machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));

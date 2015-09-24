@@ -26,6 +26,7 @@ class childListElement{
         void changeChildStatus(ChildStatus childStatus){ this->childStatus=childStatus; };
         int getExitVal(){ return this->exitVal; };
         void changeExitVal(int exitVal){ this->exitVal=exitVal; };
+        NachOSThread* getChildThread(){ return this->childThread;   };
         
        
 };
