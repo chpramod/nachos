@@ -369,11 +369,7 @@ ExceptionHandler(ExceptionType which) {
         /*IntStatus oldLevel = interrupt->SetLevel(IntOff);
         (void) interrupt->SetLevel(oldLevel);*/
         currentThread->FinishThread();
-        // Advance program counters.
-            machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-            machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-            machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
-           
+          
     }   
     else {
         printf("Unexpected user mode exception %d %d\n", which, type);
