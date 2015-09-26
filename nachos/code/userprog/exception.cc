@@ -319,7 +319,9 @@ ExceptionHandler(ExceptionType which) {
                 NachOSThread* childThread;
                 childThread = chldStruct->getChildThread();
                 childThread->setChildStatus(PARENT_WAITING);
+                IntStatus oldLevel = interrupt->SetLevel(IntOff);
                 currentThread->PutThreadToSleep();
+                (void) interrupt->SetLevel(oldLevel);
             }
         }
         else    machine->WriteRegister(2, -1);
@@ -346,10 +348,14 @@ ExceptionHandler(ExceptionType which) {
         
         if(currentThread->parent!=NULL){
             int thisPid = currentThread->getPID();
-            if(currentThread->getChildStatus()==PARENT_WAITING){
-                scheduler->ReadyToRun(currentThread->parent);
-            }
             currentThread->parent->updateChildLife(thisPid,exitstatus);
+            //Updating before ReadyToRun so that even on process switch,
+            //exitstatus is passed to the parent.
+            if(currentThread->getChildStatus()==PARENT_WAITING){
+                IntStatus oldLevel = interrupt->SetLevel(IntOff);
+                scheduler->ReadyToRun(currentThread->parent);
+                (void) interrupt->SetLevel(oldLevel);
+            }
             //system_PrintString("Did this: \n");
             //DEBUG('t', "did This.\n");
         }
