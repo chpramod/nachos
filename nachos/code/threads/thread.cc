@@ -43,12 +43,13 @@ extern int totalThreads;
 
 NachOSThread::NachOSThread(char* threadName)
 {
+    num_instr=0;
     name = threadName;
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
     pid = ++currPID;
-    ppid=-1;
+    ppid=0;
     pcStatus = PARENT_NOT_WAITING;
     parent = NULL;
     child = new List;

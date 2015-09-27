@@ -160,8 +160,9 @@ ExceptionHandler(ExceptionType which) {
         machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
     } else if ((which == SyscallException) && (type == syscall_GetPA)) {
         int phyaddr;
-        ExceptionType ans = machine->Translate((unsigned) machine->ReadRegister(4), &phyaddr, 4, false);
-        if (ans == AddressErrorException || ans == PageFaultException || ans == BusErrorException) machine->WriteRegister(2, -1);
+        int viraddr = (unsigned) machine->ReadRegister(4);
+        if(viraddr/)
+        ExceptionType ans = machine->Translate(viraddr, &phyaddr, 4, false);
         machine->WriteRegister(2, phyaddr);
         // Advance program counters.
         machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
@@ -175,7 +176,7 @@ ExceptionHandler(ExceptionType which) {
         machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
         machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
     } else if ((which == SyscallException) && (type == syscall_NumInstr)) {
-        printvalus = stats->userTicks;
+        printvalus = currentThread->num_instr;
         machine->WriteRegister(2, printvalus);
         // Advance program counters.
         machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
@@ -296,6 +297,7 @@ ExceptionHandler(ExceptionType which) {
         space = new AddrSpace(NULL,true);
         (void) interrupt->SetLevel(oldLevel);
         fork_child->space = space;
+        //fork_child->InitializeMe();
 
         machine->WriteRegister(2, 0);
         fork_child->SaveUserState();

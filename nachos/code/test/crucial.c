@@ -22,7 +22,6 @@ main()
            
         }
         else{
-           system_Sleep(100000);
            system_PrintString("Child PID: ");
            system_PrintInt(system_GetPID());
            system_PrintChar('\n');
@@ -48,7 +47,6 @@ main()
         }
     }
     else {
-        system_Sleep(1000000);
        system_PrintString("Parent after fork waiting for child: ");
        system_PrintInt(x);
        system_PrintChar('\n');
@@ -57,5 +55,5 @@ main()
        system_PrintInt(system_GetNumInstr());
        system_PrintString(" instructions.\n");
     }
-    system_Exit(0);
+    return 0;
 }

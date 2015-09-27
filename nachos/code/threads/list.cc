@@ -80,11 +80,13 @@ List::Append(void *item)
 
     if (IsEmpty()) {		// list is empty
 	first = element;
+        first->next=last;
 	last = element;
     } else {			// else put it after last
 	last->next = element;
 	last = element;
     }
+    last->next=NULL;
 }
 
 void
@@ -94,11 +96,13 @@ List::AppendWithKey(void *item, int itemKey)
 
     if (IsEmpty()) {		// list is empty
 	first = element;
+        first->next=last;
 	last = element;
     } else {			// else put it after last
 	last->next = element;
 	last = element;
     }
+    last->next=NULL;
 }
 //----------------------------------------------------------------------
 // List::Prepend
@@ -259,12 +263,11 @@ List::Search(int searchKey)
 {
     ListElement *element = first;
     void *thing=NULL;
-    
     while(element!=NULL){
         thing = element->item;
         if(element->key==searchKey) return thing;
         element = element->next;
     }
-    
+    return NULL;
 }
 

@@ -129,13 +129,14 @@ class NachOSThread {
     void updateChildLife(int childPid, int exitValue);
     List* getChildList(){   return child;   };
     void resetParent();
+    //void InitializeMe();
     
     int setPPID(int value);
     //for exit status
     
     NachOSThread* parent; //Parent of the current thread
     
-    
+    int num_instr;
 
   private:
     // some of the private data for this class is listed above
