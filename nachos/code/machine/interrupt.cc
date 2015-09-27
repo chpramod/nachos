@@ -156,9 +156,11 @@ Interrupt::OneTick()
     if (status == SystemMode) {
         stats->totalTicks += SystemTick;
 	stats->systemTicks += SystemTick;
+        currentThread->num_instr+=SystemTick/10;
     } else {					// USER_PROGRAM
 	stats->totalTicks += UserTick;
 	stats->userTicks += UserTick;
+        currentThread->num_instr+=UserTick;
     }
     DEBUG('i', "\n== Tick %d ==\n", stats->totalTicks);
 

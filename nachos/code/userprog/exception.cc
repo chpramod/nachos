@@ -161,9 +161,13 @@ ExceptionHandler(ExceptionType which) {
     } else if ((which == SyscallException) && (type == syscall_GetPA)) {
         int phyaddr;
         int viraddr = (unsigned) machine->ReadRegister(4);
-        if(viraddr/)
-        ExceptionType ans = machine->Translate(viraddr, &phyaddr, 4, false);
-        machine->WriteRegister(2, phyaddr);
+        if(viraddr/PageSize > machine->pageTableSize) machine->WriteRegister(2,-1);
+        else if(machine->pageTable[viraddr/PageSize].valid==FALSE) machine->WriteRegister(2,-1);
+        else if(machine->pageTable[viraddr/PageSize].physicalPage >= NumPhysPages) machine->WriteRegister(2,-1);
+        else{
+            machine->Translate(viraddr, &phyaddr, 4, false);
+            machine->WriteRegister(2, phyaddr);
+        }
         // Advance program counters.
         machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
         machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
