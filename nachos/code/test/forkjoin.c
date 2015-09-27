@@ -50,7 +50,8 @@ main()
        system_PrintChar('\n');
        /*system_PrintString("Parent executed ");
        system_PrintInt(system_GetNumInstr());
-       system_PrintString(" instructions.\n")*/;
+       system_PrintString(" instructions.\n");*/
+       system_Exit(0);
     }
     return 0;
 }

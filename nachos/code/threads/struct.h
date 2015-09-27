@@ -27,6 +27,12 @@ class childListElement{
         int getExitVal(){ return this->exitVal; };
         void changeExitVal(int exitVal){ this->exitVal=exitVal; };
         NachOSThread* getChildThread(){ return this->childThread;   };
+        void resetParent(){
+            if(this->childStatus==ALIVE){
+                this->childThread->setPPID(0);
+                this->childThread->parent=NULL;
+            }
+        }
         
        
 };

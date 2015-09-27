@@ -128,6 +128,7 @@ class NachOSThread {
     void addChildToList(NachOSThread* chld);
     void updateChildLife(int childPid, int exitValue);
     List* getChildList(){   return child;   };
+    void resetParent();
     
     int setPPID(int value);
     //for exit status

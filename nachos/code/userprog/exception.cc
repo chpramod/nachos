@@ -368,6 +368,7 @@ ExceptionHandler(ExceptionType which) {
         //processArray[currentThread->getPID()].exitStatus=exitstatus;
         /*IntStatus oldLevel = interrupt->SetLevel(IntOff);
         (void) interrupt->SetLevel(oldLevel);*/
+        currentThread->resetParent();
         currentThread->FinishThread();
           
     }   

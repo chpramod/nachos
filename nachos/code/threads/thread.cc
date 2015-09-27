@@ -122,6 +122,17 @@ NachOSThread::updateChildLife(int childPid, int exitValue)
     }
 }
 
+void
+NachOSThread::resetParent(){
+    bool flag = child->IsEmpty();
+    childListElement *chldStruct;
+    while(flag==false){
+        chldStruct = (childListElement *)child->Remove();
+        chldStruct->resetParent();
+        flag = child->IsEmpty();
+    }
+}
+
 
 //----------------------------------------------------------------------
 // NachOSThread::ThreadFork
