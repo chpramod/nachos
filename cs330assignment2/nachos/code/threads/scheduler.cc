@@ -31,7 +31,7 @@ Scheduler::Scheduler()
 { 
     readyList = new List; 
     policy = DEFAULT;
-    quanta = 100;
+    quanta = 0;
 } 
 
 //----------------------------------------------------------------------
@@ -56,7 +56,7 @@ void
 Scheduler::ReadyToRun (NachOSThread *thread)
 {
     DEBUG('t', "Putting thread %s on ready list.\n", thread->getName());
-
+    //printf("[pid %d] appended\n",thread->GetPID());
     thread->setStatus(READY);
     readyList->Append((void *)thread);
 }
@@ -93,7 +93,7 @@ void
 Scheduler::Run (NachOSThread *nextThread)
 {
     NachOSThread *oldThread = currentThread;
-    
+    //printf("[pid %d] next [pid %d] old\n",nextThread->GetPID(), currentThread->GetPID());
 #ifdef USER_PROGRAM			// ignore until running user programs 
     if (currentThread->space != NULL) {	// if this thread is a user program,
         currentThread->SaveUserState(); // save the user's CPU registers
@@ -178,4 +178,14 @@ void
 Scheduler::SetPolicy(int policy_value, int quanta_value){
     policy = policy_value;
     quanta = quanta_value;
+}
+
+int
+Scheduler::GetPolicy(){
+    return policy;
+}
+
+int
+Scheduler::GetQuanta(){
+    return quanta;
 }

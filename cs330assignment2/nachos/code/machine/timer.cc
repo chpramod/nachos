@@ -80,6 +80,8 @@ Timer::TimeOfNextInterrupt()
 {
     if (randomize)
 	return 1 + (Random() % (TimerTicks * 2));
+    else if (scheduler->GetQuanta()>0)
+        return scheduler->GetQuanta();
     else
-	return TimerTicks; 
+	return TimerTicks;
 }

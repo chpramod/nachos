@@ -335,7 +335,19 @@ NachOSThread::GetPriority(){
 static void ThreadFinish()    { currentThread->FinishThread(); }
 static void InterruptEnable() { interrupt->Enable(); }
 void ThreadPrint(int arg){ NachOSThread *t = (NachOSThread *)arg; t->Print(); }
+//----------------------------------------------------------------------
+// NachOSThread::Schedule
+//      Enqueues the thread in the ready queue.
+//----------------------------------------------------------------------
 
+void
+NachOSThread::Schedule()
+{
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);
+    scheduler->ReadyToRun(this);        // ReadyToRun assumes that interrupts
+                                        // are disabled!
+    (void) interrupt->SetLevel(oldLevel);
+}
 //----------------------------------------------------------------------
 // NachOSThread::ThreadStackAllocate
 //	Allocate and initialize an execution stack.  The stack is
@@ -471,19 +483,7 @@ NachOSThread::ResetReturnValue ()
    userRegisters[2] = 0;
 }
 
-//----------------------------------------------------------------------
-// NachOSThread::Schedule
-//      Enqueues the thread in the ready queue.
-//----------------------------------------------------------------------
 
-void
-NachOSThread::Schedule()
-{
-    IntStatus oldLevel = interrupt->SetLevel(IntOff);
-    scheduler->ReadyToRun(this);        // ReadyToRun assumes that interrupts
-                                        // are disabled!
-    (void) interrupt->SetLevel(oldLevel);
-}
 
 //----------------------------------------------------------------------
 // NachOSThread::Startup

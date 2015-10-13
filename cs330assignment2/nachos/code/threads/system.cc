@@ -76,8 +76,10 @@ TimerInterruptHandler(int dummy)
            sleepQueueHead = sleepQueueHead->GetNext();
            delete ptr;
         }
-        //printf("[%d] Timer interrupt.\n", stats->totalTicks);
-        interrupt->YieldOnReturn();
+        printf("[%d] Timer interrupt.\n", stats->totalTicks);
+        if(scheduler->GetPolicy()==DEFAULT || scheduler->GetPolicy()==SHORTEST){
+            interrupt->YieldOnReturn();
+        }
     }
 }
 

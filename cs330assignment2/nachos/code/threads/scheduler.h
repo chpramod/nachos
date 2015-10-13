@@ -36,6 +36,8 @@ class Scheduler {
     void Tail();                        // Used by fork()
     
     void SetPolicy(int policy_value, int quanta_value);
+    int GetPolicy();
+    int GetQuanta();
     
   private:
     List *readyList;  		// queue of threads that are ready to run,
