@@ -14,6 +14,7 @@
 #include "addrspace.h"
 #include "synch.h"
 
+extern void ForkStartFunction (int dummy);
 //----------------------------------------------------------------------
 // StartProcess
 // 	Run a user program.  Open the executable, load it into
@@ -46,6 +47,67 @@ StartProcess(char *filename)
 
 // Data structures needed for the console test.  Threads making
 // I/O requests wait on a Semaphore to delay until the I/O completes.
+
+void BatchProcess(char* filename){
+    OpenFile *file = fileSystem->Open(filename);
+    if (file == NULL) {
+        printf("Unable to open file %s\n", filename);
+        return;
+    }
+
+    int filelength = file->Length();
+    char Buffer[filelength];
+    OpenFile *executable;
+    NachOSThread *thread;
+    AddrSpace *space;
+    
+    file->ReadAt(Buffer, (filelength-1), 0);
+    DEBUG('s', "running batch jobs from \"%s\"\n", filename);
+  
+    int i=0, j=0, k=0;
+    char name[100];
+    char priority[10];
+    
+    while(i<filelength){
+        if(Buffer[i]<0) break;
+        if(Buffer[i]==' ' || Buffer[i]=='\n'){
+            name[j]='\0';   
+            j=0;k=0;
+            if(Buffer[i]==' ') i++;
+            while(Buffer[i]!='\n' && i<filelength){
+                if(Buffer[i]<0) break;
+                priority[k] = Buffer[i];
+                i++;k++;
+            }
+            priority[k]='\0';
+            i++;
+            executable = fileSystem->Open(name);
+            if (executable == NULL) {
+                printf("Unable to open file %s\n", filename);
+                return;
+            }
+            space = new AddrSpace(executable);   
+            thread = new NachOSThread(name);
+            thread->space = space;
+            if(priority[0]!='\0') thread->SetPriority(atoi(priority));
+            delete executable;			// close file
+
+            space->InitRegisters();		// set the initial register values
+            thread->SaveUserState();		// load page table register
+            thread->ThreadFork(ForkStartFunction, 0);	// Make it ready for a later context switch
+            printf("%s %s\n",name,priority);
+        }
+        else{
+            name[j] = Buffer[i];
+            i++;j++;
+        }
+    }
+    exitThreadArray[currentThread->GetPID()] = true;
+    for (i=0; i<thread_index; i++) {
+          if (!exitThreadArray[i]) break;
+       }
+    currentThread->Exit(i==thread_index, 0);
+}
 
 static Console *console;
 static Semaphore *readAvail;

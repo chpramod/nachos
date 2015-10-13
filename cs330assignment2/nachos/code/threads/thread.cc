@@ -60,6 +60,7 @@ NachOSThread::NachOSThread(char* threadName)
     for (i=0; i<MAX_CHILD_COUNT; i++) exitedChild[i] = false;
 
     instructionCount = 0;
+    priority = 100;
 }
 
 //----------------------------------------------------------------------
@@ -320,6 +321,16 @@ NachOSThread::PutThreadToSleep ()
 //	(which we can pass a pointer to), that then simply calls the 
 //	member function.
 //----------------------------------------------------------------------
+
+void
+NachOSThread::SetPriority(int value){
+    priority = value;
+}
+
+int
+NachOSThread::GetPriority(){
+    return priority;
+}
 
 static void ThreadFinish()    { currentThread->FinishThread(); }
 static void InterruptEnable() { interrupt->Enable(); }

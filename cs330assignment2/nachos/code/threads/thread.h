@@ -136,6 +136,9 @@ class NachOSThread {
     void IncInstructionCount();
     unsigned GetInstructionCount();
 
+    void SetPriority(int value);
+    int GetPriority();
+    
   private:
     // some of the private data for this class is listed above
     
@@ -155,7 +158,7 @@ class NachOSThread {
     int waitchild_id;                   // Child I am waiting on (as a result of a Join call)
 
     unsigned instructionCount;		// Keeps track of the instruction count executed by this thread
-
+    int priority;
 #ifdef USER_PROGRAM
 // A thread running a user program actually has *two* sets of CPU registers -- 
 // one for its state while executing user code, one for its state 

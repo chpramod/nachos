@@ -105,7 +105,7 @@ ExceptionHandler(ExceptionType which)
     }
     else if ((which == SyscallException) && (type == syscall_Exit)) {
        exitcode = machine->ReadRegister(4);
-       printf("[pid %d]: Exit called. Code: %d\n", currentThread->GetPID(), exitcode);
+       printf("[pid %d priority %d]: Exit called. Code: %d\n", currentThread->GetPID(), currentThread->GetPriority(), exitcode);
        // We do not wait for the children to finish.
        // The children will continue to run.
        // We will worry about this when and if we implement signals.
