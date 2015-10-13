@@ -64,7 +64,7 @@ void BatchProcess(char* filename){
     file->ReadAt(Buffer, (filelength-1), 0);
     DEBUG('s', "running batch jobs from \"%s\"\n", filename);
   
-    int i=0, j=0, k=0;
+    int i=0, j=0, k=0, policy=1;
     char name[100];
     char priority[10];
     
@@ -74,28 +74,33 @@ void BatchProcess(char* filename){
             name[j]='\0';   
             j=0;k=0;
             if(Buffer[i]==' ') i++;
-            while(Buffer[i]!='\n' && i<filelength){
-                if(Buffer[i]<0) break;
+            while(Buffer[i]!='\n' && i<filelength && Buffer[i] >=0){
                 priority[k] = Buffer[i];
                 i++;k++;
             }
             priority[k]='\0';
             i++;
-            executable = fileSystem->Open(name);
-            if (executable == NULL) {
-                printf("Unable to open file %s\n", filename);
-                return;
+            if(policy){
+                scheduler->SetPolicy(atoi(name),atoi(priority));
+                policy=0;
             }
-            space = new AddrSpace(executable);   
-            thread = new NachOSThread(name);
-            thread->space = space;
-            if(priority[0]!='\0') thread->SetPriority(atoi(priority));
-            delete executable;			// close file
+            else{
+                executable = fileSystem->Open(name);
+                if (executable == NULL) {
+                    printf("Unable to open file %s\n", filename);
+                    return;
+                }
+                space = new AddrSpace(executable);   
+                thread = new NachOSThread(name);
+                thread->space = space;
+                if(priority[0]!='\0') thread->SetPriority(atoi(priority));
+                delete executable;			// close file
 
-            space->InitRegisters();		// set the initial register values
-            thread->SaveUserState();		// load page table register
-            thread->ThreadFork(ForkStartFunction, 0);	// Make it ready for a later context switch
-            printf("%s %s\n",name,priority);
+                space->InitRegisters();		// set the initial register values
+                thread->SaveUserState();		// load page table register
+                thread->ThreadFork(ForkStartFunction, 0);	// Make it ready for a later context switch
+                printf("%s %s\n",name,priority);
+            }
         }
         else{
             name[j] = Buffer[i];

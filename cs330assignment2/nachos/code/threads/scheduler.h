@@ -9,6 +9,11 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#define DEFAULT 0 // Non-preemptive default NachOS scheduling
+#define SHORTEST 1 // Non-preemptive shortest next CPU burst first algorithm
+#define ROUNDROBIN 2 // Round-Robin scheduling algorithm
+#define UNIX 3 // Unix Scheduler
+
 #include "copyright.h"
 #include "list.h"
 #include "thread.h"
@@ -29,10 +34,14 @@ class Scheduler {
     void Print();			// Print contents of ready list
     
     void Tail();                        // Used by fork()
-
+    
+    void SetPolicy(int policy_value, int quanta_value);
+    
   private:
     List *readyList;  		// queue of threads that are ready to run,
 				// but not running
+    int policy,quanta;
+
 };
 
 #endif // SCHEDULER_H

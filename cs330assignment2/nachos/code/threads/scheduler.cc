@@ -30,6 +30,8 @@
 Scheduler::Scheduler()
 { 
     readyList = new List; 
+    policy = DEFAULT;
+    quanta = 100;
 } 
 
 //----------------------------------------------------------------------
@@ -170,4 +172,10 @@ Scheduler::Print()
 {
     printf("Ready list contents:\n");
     readyList->Mapcar((VoidFunctionPtr) ThreadPrint);
+}
+
+void
+Scheduler::SetPolicy(int policy_value, int quanta_value){
+    policy = policy_value;
+    quanta = quanta_value;
 }
