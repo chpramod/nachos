@@ -22,6 +22,10 @@ Statistics::Statistics()
     numDiskReads = numDiskWrites = 0;
     numConsoleCharsRead = numConsoleCharsWritten = 0;
     numPageFaults = numPacketsSent = numPacketsRecvd = 0;
+    numBursts = minBurst = maxBurst = totalBurst = 0;
+    minCompletion = maxCompletion = totalCompletion = 0;
+    squareCompletion = 0;
+    totalWait = waitCount = threadCount = 0;
 }
 
 //----------------------------------------------------------------------
@@ -32,7 +36,21 @@ Statistics::Statistics()
 
 void
 Statistics::Print()
-{
+{   
+    if(threadCount>0){
+        int avg_completion = totalCompletion/threadCount;
+        long long int var_completion = squareCompletion/threadCount - (long long int)avg_completion*avg_completion;
+        double util = (systemTicks + userTicks)/(double)totalTicks;
+        int avg_wait = totalWait/threadCount;
+        int avg_burst = totalBurst/numBursts;
+        printf("CPU Busy Time: %d\n", totalTicks-idleTicks);
+        printf("Execution Time: %d\n", totalTicks);
+        printf("CPU Utilization: %lf\n",util);
+        printf("CPU Burst: maximum %d, minimum %d, average %d\n", maxBurst, minBurst, avg_burst);
+        printf("Average Wait Time: %d\n", avg_wait);
+        printf("Thread Completion: maximum %d, minimum %d, average %d, variance %lld\n",maxCompletion, minCompletion, avg_completion, var_completion);
+        printf("Number Of Threads: %d\n", threadCount);
+    }
     printf("Ticks: total %d, idle %d, system %d, user %d\n", totalTicks, 
 	idleTicks, systemTicks, userTicks);
     printf("Disk I/O: reads %d, writes %d\n", numDiskReads, numDiskWrites);

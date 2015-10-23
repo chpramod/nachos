@@ -49,6 +49,7 @@ StartProcess(char *filename)
 // I/O requests wait on a Semaphore to delay until the I/O completes.
 
 void BatchProcess(char* filename){
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);
     OpenFile *file = fileSystem->Open(filename);
     if (file == NULL) {
         printf("Unable to open file %s\n", filename);
@@ -71,17 +72,16 @@ void BatchProcess(char* filename){
     while(i<filelength){
         if(Buffer[i]<0) break;
         if(Buffer[i]==' ' || Buffer[i]=='\n'){
-            name[j]='\0';   
-            j=0;k=0;
+            name[j]='\0';
             if(Buffer[i]==' ') i++;
-            while(Buffer[i]!='\n' && i<filelength && Buffer[i] >=0){
+            while(Buffer[i]!='\n' && i<filelength && Buffer[i]>=0){
                 priority[k] = Buffer[i];
                 i++;k++;
             }
             priority[k]='\0';
             i++;
             if(policy){
-                scheduler->SetPolicy(atoi(name),atoi(priority));
+                scheduler->SetPolicy(atoi(name));
                 policy=0;
             }
             else{
@@ -90,8 +90,9 @@ void BatchProcess(char* filename){
                     printf("Unable to open file %s\n", filename);
                     return;
                 }
-                space = new AddrSpace(executable);   
-                thread = new NachOSThread(name);
+                space = new AddrSpace(executable);
+                name[j]='|';name[j+1]='0'+thread_index%10;name[j+2]='\0';
+                thread = new NachOSThread(strdup(name));
                 thread->space = space;
                 if(priority[0]!='\0') thread->SetPriority(atoi(priority));
                 delete executable;			// close file
@@ -99,8 +100,10 @@ void BatchProcess(char* filename){
                 space->InitRegisters();		// set the initial register values
                 thread->SaveUserState();		// load page table register
                 thread->ThreadFork(ForkStartFunction, 0);	// Make it ready for a later context switch
-                printf("%s %s\n",name,priority);
+                
+                DEBUG('s',"%s %s\n",name,priority);
             }
+            j=0;k=0;
         }
         else{
             name[j] = Buffer[i];
@@ -108,10 +111,8 @@ void BatchProcess(char* filename){
         }
     }
     exitThreadArray[currentThread->GetPID()] = true;
-    for (i=0; i<thread_index; i++) {
-          if (!exitThreadArray[i]) break;
-       }
-    currentThread->Exit(i==thread_index, 0);
+    currentThread->PutThreadToSleep();
+    currentThread->Exit(true,0);
 }
 
 static Console *console;

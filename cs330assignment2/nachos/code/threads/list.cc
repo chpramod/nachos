@@ -80,11 +80,13 @@ List::Append(void *item)
 
     if (IsEmpty()) {		// list is empty
 	first = element;
+        first->next = last;
 	last = element;
     } else {			// else put it after last
 	last->next = element;
 	last = element;
     }
+    last->next=NULL;
 }
 
 //----------------------------------------------------------------------
@@ -106,6 +108,7 @@ List::Prepend(void *item)
 
     if (IsEmpty()) {		// list is empty
 	first = element;
+        first->next = last;
 	last = element;
     } else {			// else put it before first
 	element->next = first;
@@ -183,7 +186,9 @@ List::SortedInsert(void *item, int sortKey)
 
     if (IsEmpty()) {	// if list is empty, put
         first = element;
+        first->next = last;
         last = element;
+        last->next=NULL;
     } else if (sortKey < first->key) {	
 		// item goes on front of list
 	element->next = first;
@@ -198,6 +203,7 @@ List::SortedInsert(void *item, int sortKey)
 	}
 	last->next = element;		// item goes at end of list
 	last = element;
+        last->next = NULL;
     }
 }
 

@@ -9,11 +9,6 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#define DEFAULT 0 // Non-preemptive default NachOS scheduling
-#define SHORTEST 1 // Non-preemptive shortest next CPU burst first algorithm
-#define ROUNDROBIN 2 // Round-Robin scheduling algorithm
-#define UNIX 3 // Unix Scheduler
-
 #include "copyright.h"
 #include "list.h"
 #include "thread.h"
@@ -30,12 +25,12 @@ class Scheduler {
     void ReadyToRun(NachOSThread* thread);	// Thread can be dispatched.
     NachOSThread* FindNextToRun();		// Dequeue first thread on the ready 
 					// list, if any, and return thread.
-    void Run(NachOSThread* nextThread);	// Cause nextThread to start running
+    void Run(NachOSThread* nextThread, bool exit=false);	// Cause nextThread to start running
     void Print();			// Print contents of ready list
     
     void Tail();                        // Used by fork()
     
-    void SetPolicy(int policy_value, int quanta_value);
+    void SetPolicy(int policy_value);
     int GetPolicy();
     int GetQuanta();
     
@@ -43,7 +38,7 @@ class Scheduler {
     List *readyList;  		// queue of threads that are ready to run,
 				// but not running
     int policy,quanta;
-
+    float alpha;
 };
 
 #endif // SCHEDULER_H

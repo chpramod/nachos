@@ -29,9 +29,9 @@
 
 Scheduler::Scheduler()
 { 
-    readyList = new List; 
-    policy = DEFAULT;
-    quanta = 0;
+    readyList = new List;
+    this->SetPolicy(-1);
+    alpha = 0.5;
 } 
 
 //----------------------------------------------------------------------
@@ -58,7 +58,21 @@ Scheduler::ReadyToRun (NachOSThread *thread)
     DEBUG('t', "Putting thread %s on ready list.\n", thread->getName());
     //printf("[pid %d] appended\n",thread->GetPID());
     thread->setStatus(READY);
-    readyList->Append((void *)thread);
+    if(policy==2 && thread->previous_burst >0 ){
+        float estimated_time = thread->estimated_burst + alpha*(thread->previous_burst - thread->estimated_burst);
+        thread->estimated_burst = estimated_time;
+        DEBUG('j',"[PID %d Estimated_Time %d]\n",thread->GetPID(),estimated_time);
+        readyList->SortedInsert((void*)thread,(int)estimated_time);
+    }
+    else if(policy==2 && thread->previous_burst == 0){
+        readyList->SortedInsert((void*)thread,(int)thread->estimated_burst);
+    }
+    else if(policy>=7 && policy<=10){
+        readyList->Append((void*)thread);
+    }
+    else readyList->Append((void *)thread);
+    thread->block_time = stats->totalTicks - thread->last_block;
+    thread->last_wait = stats->totalTicks;
 }
 
 //----------------------------------------------------------------------
@@ -71,8 +85,61 @@ Scheduler::ReadyToRun (NachOSThread *thread)
 
 NachOSThread *
 Scheduler::FindNextToRun ()
-{
-    return (NachOSThread *)readyList->Remove();
+{   
+    if(policy==2){
+        NachOSThread* thread = (NachOSThread*)readyList->SortedRemove(NULL);;
+        if(thread!=NULL) DEBUG('j',"[PID %d Estimated_Time %d]\n",thread->GetPID(),thread->estimated_burst);
+        return thread;
+    }
+    else if(policy>=7 && policy<=10){
+        ListElement* min_list_element = readyList->first;
+        ListElement* list_element = min_list_element;
+        NachOSThread* thread;
+        if(min_list_element == NULL) {
+            thread = NULL;
+        }
+        else{
+            int min = ((NachOSThread* )min_list_element->item)->GetPriority();
+            NachOSThread* temp = (NachOSThread* )min_list_element->item;
+            thread = temp;
+
+            while(list_element!=NULL) {
+               temp = (NachOSThread *)list_element->item;
+
+               if(temp->GetPriority() <= min) {
+                   min_list_element = list_element;
+                   min = temp->GetPriority();
+                   thread = temp;
+               }
+               list_element=list_element->next;
+            }
+
+            list_element = readyList->first;
+            if (list_element == min_list_element) {
+                thread = (NachOSThread *)readyList->Remove();
+            }
+            else{
+                ListElement* previous = list_element;
+                list_element = list_element->next;
+                while(list_element!=NULL) {
+                    if(list_element == min_list_element) {
+                        previous->next = list_element->next;
+                            if (list_element == readyList->last) {
+                            readyList->last = previous;
+                        }
+                    }
+                    previous = list_element;
+                    list_element = list_element->next;
+                }
+                delete min_list_element;
+            }
+        }
+        currentThread->cpu_count+=currentThread->previous_burst;
+        for(int i=0;i<thread_index;i++) if(exitThreadArray[i]==FALSE) threadArray[i]->cpu_count/=2;
+        return thread;
+
+    }
+    else return (NachOSThread *)readyList->Remove();
 }
 
 //----------------------------------------------------------------------
@@ -90,7 +157,7 @@ Scheduler::FindNextToRun ()
 //----------------------------------------------------------------------
 
 void
-Scheduler::Run (NachOSThread *nextThread)
+Scheduler::Run (NachOSThread *nextThread, bool exit)
 {
     NachOSThread *oldThread = currentThread;
     //printf("[pid %d] next [pid %d] old\n",nextThread->GetPID(), currentThread->GetPID());
@@ -110,13 +177,38 @@ Scheduler::Run (NachOSThread *nextThread)
     DEBUG('t', "Switching from thread \"%s\" to thread \"%s\"\n",
 	  oldThread->getName(), nextThread->getName());
     
+    currentThread->wait_time += stats->totalTicks - currentThread->last_wait;
+    currentThread->last_burst = stats->totalTicks;
+    
+    oldThread->previous_burst = stats->totalTicks - oldThread->last_burst;
+    oldThread->cpu_burst+= oldThread->previous_burst;
+    oldThread->burst_count++;
+    if(oldThread->previous_burst == 0) oldThread->zero_burst++;
+    
+    if(stats->maxBurst < oldThread->previous_burst) stats->maxBurst = oldThread->previous_burst;
+    if(stats->minBurst > oldThread->previous_burst || stats->minBurst == 0) stats->minBurst = oldThread->previous_burst;
+    
+    if(exit){
+        stats->threadCount++;
+        stats->totalBurst += oldThread->cpu_burst;
+        //printf("[Bursts %d %d]\n", oldThread->cpu_burst, stats->totalBurst);
+        stats->numBursts += oldThread->burst_count - oldThread->zero_burst;
+        if(stats->maxCompletion < oldThread->end_time) stats->maxCompletion = oldThread->end_time;
+        if(stats->minCompletion > oldThread->end_time || stats->minCompletion == 0) stats->minCompletion = oldThread->end_time;
+        //printf("[stats->totalCompletion %d %d %d]\n",oldThread->GetPID(), oldThread->end_time, stats->totalCompletion);
+        stats->totalCompletion += oldThread->end_time;
+        //printf("[stats->totalCompletion %d %d %d]\n",oldThread->GetPID(), oldThread->end_time, stats->totalCompletion);
+        long long int square_end = oldThread->end_time*oldThread->end_time;
+        //printf("[stats->squareCompletion %d %d %lld %lld]\n",oldThread->GetPID(),oldThread->end_time, square_end, stats->squareCompletion);
+        stats->squareCompletion += square_end;
+        //printf("[stats->squareCompletion %d %d %lld %lld]\n",oldThread->GetPID(),oldThread->end_time, square_end, stats->squareCompletion);
+        stats->totalWait += oldThread->wait_time;
+    }
     // This is a machine-dependent assembly language routine defined 
     // in switch.s.  You may have to think
     // a bit to figure out what happens after this, both from the point
     // of view of the thread and from the perspective of the "outside world".
-
     _SWITCH(oldThread, nextThread);
-    
     DEBUG('t', "Now in thread \"%s\"\n", currentThread->getName());
 
     // If the old thread gave up the processor because it was finishing,
@@ -175,9 +267,43 @@ Scheduler::Print()
 }
 
 void
-Scheduler::SetPolicy(int policy_value, int quanta_value){
+Scheduler::SetPolicy(int policy_value){
     policy = policy_value;
-    quanta = quanta_value;
+    switch(policy){
+        case 1: // Non-preemptive default NachOS scheduling
+            quanta = 98;
+            break;
+        case 2: // Non-preemptive shortest next CPU burst first algorithm
+            quanta = 98;
+            break;
+        case 3: // Round-robin
+            quanta = 74;
+            break;
+        case 4: // Round-robin 
+            quanta = 49;
+            break;
+        case 5: // Round-robin 
+            quanta = 25;
+            break;
+        case 6: // Round-robin 
+            quanta = 20;
+            break;
+        case 7: // UNIX Scheduler 
+            quanta = 74;
+            break;
+        case 8: // UNIX Scheduler 
+            quanta = 49;
+            break;
+        case 9: // UNIX Scheduler 
+            quanta = 25;
+            break;
+        case 10: // UNIX Scheduler 
+            quanta = 20;
+            break;
+        default:
+            quanta = 98;
+            break;
+    }
 }
 
 int

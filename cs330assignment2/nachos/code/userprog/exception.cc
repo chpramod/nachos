@@ -105,7 +105,7 @@ ExceptionHandler(ExceptionType which)
     }
     else if ((which == SyscallException) && (type == syscall_Exit)) {
        exitcode = machine->ReadRegister(4);
-       printf("[pid %d priority %d]: Exit called. Code: %d\n", currentThread->GetPID(), currentThread->GetPriority(), exitcode);
+       DEBUG('a',"[pid %d priority %d]: Exit called. Code: %d\n", currentThread->GetPID(), currentThread->GetPriority(), exitcode);
        // We do not wait for the children to finish.
        // The children will continue to run.
        // We will worry about this when and if we implement signals.
@@ -224,6 +224,7 @@ ExceptionHandler(ExceptionType which)
     }
     else if ((which == SyscallException) && (type == syscall_PrintString)) {
        vaddr = machine->ReadRegister(4);
+       int time;
        machine->ReadMem(vaddr, 1, &memval);
        while ((*(char*)&memval) != '\0') {
 	  writeDone->P() ;

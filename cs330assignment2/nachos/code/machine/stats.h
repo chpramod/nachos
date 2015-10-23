@@ -36,6 +36,20 @@ class Statistics {
     int numPacketsSent;		// number of packets sent over the network
     int numPacketsRecvd;	// number of packets received over the network
 
+    
+    int numBursts;
+    int minBurst;
+    int maxBurst;
+    int totalBurst;
+    int minCompletion;
+    int maxCompletion;
+    int totalCompletion;
+    long long int squareCompletion;
+    int totalWait;
+    int waitCount;
+    int threadCount;
+    
+    
     Statistics(); 		// initialize everything to zero
 
     void Print();		// print collected statistics

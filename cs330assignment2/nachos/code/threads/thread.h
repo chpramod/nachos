@@ -56,7 +56,7 @@
 // Size of the thread's private execution stack.
 // WATCH OUT IF THIS ISN'T BIG ENOUGH!!!!!
 #define StackSize	(4 * 1024)	// in words
-
+#define BASE_USER_PRIORITY 50 // Base Priority value
 
 // Thread state
 enum ThreadStatus { JUST_CREATED, RUNNING, READY, BLOCKED };
@@ -139,6 +139,20 @@ class NachOSThread {
     void SetPriority(int value);
     int GetPriority();
     
+    int start_time; // Start Time of the thread
+    int end_time; // End time of the thread
+    int cpu_burst; // Total CPU Burst Length
+    int burst_count; // Total number of CPU Bursts
+    int zero_burst; // Total number of zero length CPU Bursts
+    int previous_burst; // Last CPU Burst Length. Used in Non-preemptive shortest next CPU burst first algorithm
+    float estimated_burst; // Estimated next CPU Burst Length. Used in Non-preemptive shortest next CPU burst first algorithm
+    int wait_time; // Total Waiting time in the Ready Queue of Scheduler
+    int block_time; // Total time the thread was blocked
+    int last_burst; // Last point of burst start
+    int last_wait; // last time of wait start
+    int last_block; // last time of block start
+    int cpu_count; // Used to calculate priority in UNIX Scheduler
+    
   private:
     // some of the private data for this class is listed above
     
@@ -158,7 +172,7 @@ class NachOSThread {
     int waitchild_id;                   // Child I am waiting on (as a result of a Join call)
 
     unsigned instructionCount;		// Keeps track of the instruction count executed by this thread
-    int priority;
+    int base_priority;
 #ifdef USER_PROGRAM
 // A thread running a user program actually has *two* sets of CPU registers -- 
 // one for its state while executing user code, one for its state 

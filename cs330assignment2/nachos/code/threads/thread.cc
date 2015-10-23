@@ -34,8 +34,6 @@
 
 NachOSThread::NachOSThread(char* threadName)
 {
-    int i;
-
     name = threadName;
     stackTop = NULL;
     stack = NULL;
@@ -57,10 +55,24 @@ NachOSThread::NachOSThread(char* threadName)
     childcount = 0;
     waitchild_id = -1;
 
-    for (i=0; i<MAX_CHILD_COUNT; i++) exitedChild[i] = false;
+    for (int i=0; i<MAX_CHILD_COUNT; i++) exitedChild[i] = false;
 
     instructionCount = 0;
-    priority = 100;
+    base_priority = BASE_USER_PRIORITY + 100;
+    
+    start_time = 0;
+    end_time = 0;
+    cpu_burst = 0;
+    burst_count = 0;
+    zero_burst = 0;
+    previous_burst = 0;
+    estimated_burst = scheduler->GetQuanta();
+    wait_time = 0;
+    block_time = 0;
+    last_burst = 0;
+    last_wait = 0;
+    last_block = 0;
+    cpu_count = 0;
 }
 
 //----------------------------------------------------------------------
@@ -169,6 +181,7 @@ NachOSThread::FinishThread ()
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
     
     threadToBeDestroyed = currentThread;
+    end_time = stats->totalTicks;
     PutThreadToSleep();					// invokes SWITCH
     // not reached
 }
@@ -215,13 +228,18 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
     ASSERT(this == currentThread);
 
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
-
+    
     threadToBeDestroyed = currentThread;
-
     NachOSThread *nextThread;
-
     status = BLOCKED;
-
+    
+    end_time = stats->totalTicks;
+    //previous_burst = stats->totalTicks - last_burst;
+    //cpu_burst+= previous_burst;
+    //burst_count++;
+    //if(previous_burst == 0) zero_burst++;
+    
+    // printf("[PID %d ZERO BURST %d]\n",pid,zero_burst);
     // Set exit code in parent's structure provided the parent hasn't exited
     if (ppid != -1) {
        ASSERT(threadArray[ppid] != NULL);
@@ -229,9 +247,9 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
           threadArray[ppid]->SetChildExitCode (pid, exitcode);
        }
     }
-
     while ((nextThread = scheduler->FindNextToRun()) == NULL) {
-        if (terminateSim) {
+        if (terminateSim && pid!=0) scheduler->Run(threadArray[0], true);
+        else if (terminateSim) {
            DEBUG('i', "Machine idle.  No interrupts to do.\n");
            printf("\nNo threads ready or runnable, and no pending interrupts.\n");
            printf("Assuming all programs completed.\n");
@@ -239,7 +257,7 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
         }
         else interrupt->Idle();      // no one to run, wait for an interrupt
     }
-    scheduler->Run(nextThread); // returns when we've been signalled
+    scheduler->Run(nextThread, true); // returns when we've been signalled
 }
 
 //----------------------------------------------------------------------
@@ -270,10 +288,38 @@ NachOSThread::YieldCPU ()
     
     DEBUG('t', "Yielding thread \"%s\"\n", getName());
     
-    nextThread = scheduler->FindNextToRun();
-    if (nextThread != NULL) {
-	scheduler->ReadyToRun(this);
-	scheduler->Run(nextThread);
+    if(scheduler->GetPolicy()<=2){
+        //previous_burst = stats->totalTicks - last_burst;
+        //cpu_burst += previous_burst;
+        //burst_count++;
+        //if(previous_burst==0) zero_burst++;
+        nextThread = scheduler->FindNextToRun();
+        if (nextThread != NULL) {
+            scheduler->ReadyToRun(this);
+            scheduler->Run(nextThread);
+        }
+    }
+    else if(scheduler->GetPolicy()>=3 && scheduler->GetPolicy()<=6){
+        if(stats->totalTicks-last_burst >= scheduler->GetQuanta()){
+            nextThread = scheduler->FindNextToRun();
+            if (nextThread != NULL) {
+                //previous_burst = stats->totalTicks - last_burst;
+                //cpu_burst += previous_burst;
+                //burst_count++;
+                //if(previous_burst==0) zero_burst++;
+                scheduler->ReadyToRun(this);
+                scheduler->Run(nextThread);
+            }
+        } 
+    }
+    else{
+        nextThread = scheduler->FindNextToRun();
+        if (nextThread != NULL) {
+            //previous_burst = stats->totalTicks - last_burst;
+            //cpu_burst += previous_burst;
+            scheduler->ReadyToRun(this);
+            scheduler->Run(nextThread);
+        }
     }
     (void) interrupt->SetLevel(oldLevel);
 }
@@ -301,15 +347,16 @@ void
 NachOSThread::PutThreadToSleep ()
 {
     NachOSThread *nextThread;
-    
     ASSERT(this == currentThread);
     ASSERT(interrupt->getLevel() == IntOff);
     
     DEBUG('t', "Sleeping thread \"%s\"\n", getName());
 
     status = BLOCKED;
-    while ((nextThread = scheduler->FindNextToRun()) == NULL)
+    last_block = stats->totalTicks;
+    while ((nextThread = scheduler->FindNextToRun()) == NULL){
 	interrupt->Idle();	// no one to run, wait for an interrupt
+    }
         
     scheduler->Run(nextThread); // returns when we've been signalled
 }
@@ -324,12 +371,12 @@ NachOSThread::PutThreadToSleep ()
 
 void
 NachOSThread::SetPriority(int value){
-    priority = value;
+    base_priority = BASE_USER_PRIORITY + value;
 }
 
 int
 NachOSThread::GetPriority(){
-    return priority;
+    return (base_priority + cpu_count/2);
 }
 
 static void ThreadFinish()    { currentThread->FinishThread(); }
