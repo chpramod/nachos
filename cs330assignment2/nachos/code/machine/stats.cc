@@ -40,7 +40,7 @@ Statistics::Print()
     if(threadCount>0){
         int avg_completion = totalCompletion/threadCount;
         long long int var_completion = squareCompletion/threadCount - (long long int)avg_completion*avg_completion;
-        double util = (systemTicks + userTicks)/(double)totalTicks;
+        double util = (totalBurst)/(double)totalTicks;
         int avg_wait = totalWait/threadCount;
         int avg_burst = totalBurst/numBursts;
         printf("CPU Busy Time: %d\n", totalTicks-idleTicks);

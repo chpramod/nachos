@@ -133,9 +133,9 @@ Scheduler::FindNextToRun ()
                 }
                 delete min_list_element;
             }
+            currentThread->cpu_count+=currentThread->previous_burst;
+            for(int i=0;i<thread_index;i++) if(exitThreadArray[i]==FALSE) threadArray[i]->cpu_count/=2;
         }
-        currentThread->cpu_count+=currentThread->previous_burst;
-        for(int i=0;i<thread_index;i++) if(exitThreadArray[i]==FALSE) threadArray[i]->cpu_count/=2;
         return thread;
 
     }
@@ -180,18 +180,10 @@ Scheduler::Run (NachOSThread *nextThread, bool exit)
     currentThread->wait_time += stats->totalTicks - currentThread->last_wait;
     currentThread->last_burst = stats->totalTicks;
     
-    oldThread->previous_burst = stats->totalTicks - oldThread->last_burst;
-    oldThread->cpu_burst+= oldThread->previous_burst;
-    oldThread->burst_count++;
-    if(oldThread->previous_burst == 0) oldThread->zero_burst++;
-    
-    if(stats->maxBurst < oldThread->previous_burst) stats->maxBurst = oldThread->previous_burst;
-    if(stats->minBurst > oldThread->previous_burst || stats->minBurst == 0) stats->minBurst = oldThread->previous_burst;
-    
     if(exit){
         stats->threadCount++;
         stats->totalBurst += oldThread->cpu_burst;
-        //printf("[Bursts %d %d]\n", oldThread->cpu_burst, stats->totalBurst);
+        //printf("[Bursts %d %d %d]\n", oldThread->cpu_burst, stats->totalBurst, stats->totalTicks);
         stats->numBursts += oldThread->burst_count - oldThread->zero_burst;
         if(stats->maxCompletion < oldThread->end_time) stats->maxCompletion = oldThread->end_time;
         if(stats->minCompletion > oldThread->end_time || stats->minCompletion == 0) stats->minCompletion = oldThread->end_time;

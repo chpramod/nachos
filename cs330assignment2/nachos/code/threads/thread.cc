@@ -182,6 +182,14 @@ NachOSThread::FinishThread ()
     
     threadToBeDestroyed = currentThread;
     end_time = stats->totalTicks;
+    previous_burst = stats->totalTicks - last_burst;
+    cpu_burst+= previous_burst;
+    burst_count++;
+    if(previous_burst == 0) zero_burst++;
+    last_burst = stats->totalTicks;
+
+    if(stats->maxBurst < previous_burst) stats->maxBurst = previous_burst;
+    if(stats->minBurst > previous_burst || stats->minBurst == 0) stats->minBurst = previous_burst;
     PutThreadToSleep();					// invokes SWITCH
     // not reached
 }
@@ -234,6 +242,15 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
     status = BLOCKED;
     
     end_time = stats->totalTicks;
+    last_block = stats->totalTicks;
+    previous_burst = stats->totalTicks - last_burst;
+    cpu_burst+= previous_burst;
+    burst_count++;
+    if(previous_burst == 0) zero_burst++;
+    last_burst = stats->totalTicks;
+
+    if(stats->maxBurst < previous_burst) stats->maxBurst = previous_burst;
+    if(stats->minBurst > previous_burst || stats->minBurst == 0) stats->minBurst = previous_burst;
     //previous_burst = stats->totalTicks - last_burst;
     //cpu_burst+= previous_burst;
     //burst_count++;
@@ -288,11 +305,16 @@ NachOSThread::YieldCPU ()
     
     DEBUG('t', "Yielding thread \"%s\"\n", getName());
     
+    previous_burst = stats->totalTicks - last_burst;
+    cpu_burst+= previous_burst;
+    burst_count++;
+    if(previous_burst == 0) zero_burst++;
+
+    if(stats->maxBurst < previous_burst) stats->maxBurst = previous_burst;
+    if(stats->minBurst > previous_burst || stats->minBurst == 0) stats->minBurst = previous_burst;
+    last_burst = stats->totalTicks;
+    
     if(scheduler->GetPolicy()<=2){
-        //previous_burst = stats->totalTicks - last_burst;
-        //cpu_burst += previous_burst;
-        //burst_count++;
-        //if(previous_burst==0) zero_burst++;
         nextThread = scheduler->FindNextToRun();
         if (nextThread != NULL) {
             scheduler->ReadyToRun(this);
@@ -303,10 +325,6 @@ NachOSThread::YieldCPU ()
         if(stats->totalTicks-last_burst >= scheduler->GetQuanta()){
             nextThread = scheduler->FindNextToRun();
             if (nextThread != NULL) {
-                //previous_burst = stats->totalTicks - last_burst;
-                //cpu_burst += previous_burst;
-                //burst_count++;
-                //if(previous_burst==0) zero_burst++;
                 scheduler->ReadyToRun(this);
                 scheduler->Run(nextThread);
             }
@@ -315,8 +333,6 @@ NachOSThread::YieldCPU ()
     else{
         nextThread = scheduler->FindNextToRun();
         if (nextThread != NULL) {
-            //previous_burst = stats->totalTicks - last_burst;
-            //cpu_burst += previous_burst;
             scheduler->ReadyToRun(this);
             scheduler->Run(nextThread);
         }
@@ -354,6 +370,14 @@ NachOSThread::PutThreadToSleep ()
 
     status = BLOCKED;
     last_block = stats->totalTicks;
+    previous_burst = stats->totalTicks - last_burst;
+    cpu_burst+= previous_burst;
+    burst_count++;
+    if(previous_burst == 0) zero_burst++;
+    last_burst = stats->totalTicks;
+    
+    if(stats->maxBurst < previous_burst) stats->maxBurst = previous_burst;
+    if(stats->minBurst > previous_burst || stats->minBurst == 0) stats->minBurst = previous_burst;
     while ((nextThread = scheduler->FindNextToRun()) == NULL){
 	interrupt->Idle();	// no one to run, wait for an interrupt
     }
