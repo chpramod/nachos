@@ -623,46 +623,48 @@ Average Wait Time: 125198
 Thread Completion: maximum 243273, minimum 113983, average 175191, variance 2317639300
 
 BATCH2
-Ticks: total 190400, idle 1638, system 96620, user 92142
+Ticks: total 219914, idle 1724, system 111710, user 106480
 Disk I/O: reads 0, writes 0
-Console I/O: reads 0, writes 263
+Console I/O: reads 0, writes 307
 Paging: faults 0
 Network I/O: packets received 0, sent 0
 
-Number Of Threads: 9
-CPU Busy Time: 188762
-Execution Time: 190400
-CPU Utilization: 0.991345
+Number Of Threads: 10
+CPU Busy Time: 218190
+Execution Time: 219914
+CPU Utilization: 0.992115
 CPU Burst: maximum 88, minimum 0, average 19
-Average Wait Time: 113211
-Thread Completion: maximum 190400, minimum 89911, average 139780, variance 1591552233
+Average Wait Time: 134762
+Thread Completion: maximum 219914, minimum 88871, average 161874, variance 1951249500
+
 
 BATCH3
-Ticks: total 185567, idle 165, system 93500, user 91902
+Ticks: total 214621, idle 351, system 108070, user 106200
 Disk I/O: reads 0, writes 0
-Console I/O: reads 0, writes 107
+Console I/O: reads 0, writes 125
 Paging: faults 0
 Network I/O: packets received 0, sent 0
 
-Number Of Threads: 9
-CPU Busy Time: 185402
-Execution Time: 185567
-CPU Utilization: 0.999057
+Number Of Threads: 10
+CPU Busy Time: 214270
+Execution Time: 214621
+CPU Utilization: 0.998318
 CPU Burst: maximum 88, minimum 0, average 19
-Average Wait Time: 110265
-Thread Completion: maximum 185567, minimum 83751, average 132736, variance 1656441657
+Average Wait Time: 136492
+Thread Completion: maximum 214621, minimum 84000, average 159948, variance 2009863600
 
 BATCH4
-Ticks: total 97346, idle 0, system 48710, user 48636
+Ticks: total 97366, idle 0, system 48730, user 48636
 Disk I/O: reads 0, writes 0
 Console I/O: reads 0, writes 0
 Paging: faults 0
 Network I/O: packets received 0, sent 0
 
-Number Of Threads: 9
-CPU Busy Time: 97346
-Execution Time: 97346
+Number Of Threads: 10
+CPU Busy Time: 97366
+Execution Time: 97366
 CPU Utilization: 0.999897
 CPU Burst: maximum 88, minimum 0, average 19
-Average Wait Time: 72187
-Thread Completion: maximum 97346, minimum 81114, average 83008, variance 25860627
+Average Wait Time: 73107
+Thread Completion: maximum 97366, minimum 81114, average 82847, variance 24569000
+
