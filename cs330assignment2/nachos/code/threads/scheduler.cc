@@ -60,6 +60,8 @@ Scheduler::ReadyToRun (NachOSThread *thread)
     thread->setStatus(READY);
     if(policy==2 && thread->previous_burst > 0 ){
         float estimated_time = thread->estimated_burst + alpha*(thread->previous_burst - thread->estimated_burst);
+        if(thread->estimated_burst > thread->previous_burst) stats->errorEstimate+= thread->estimated_burst - thread->previous_burst;
+        else stats->errorEstimate+= thread->previous_burst - thread->estimated_burst;
         thread->estimated_burst = estimated_time;
         DEBUG('j',"[PID %d Estimated_Time %d]\n",thread->GetPID(),estimated_time);
         readyList->SortedInsert((void*)thread,(int)estimated_time);

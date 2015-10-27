@@ -48,6 +48,7 @@ class Statistics {
     int totalWait;
     int waitCount;
     int threadCount;
+    int errorEstimate;
     
     
     Statistics(); 		// initialize everything to zero

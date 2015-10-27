@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 1
 ../test/testloop 
 ../test/testloop 
@@ -9,3 +10,16 @@
 ../test/testloop 
 ../test/testloop 
 ../test/testloop 
+=======
+2
+../test/testloop 10
+../test/testloop 20
+../test/testloop 30
+../test/testloop 40
+../test/testloop 50
+../test/testloop 60
+../test/testloop 70
+../test/testloop 80
+../test/testloop 90
+../test/testloop 100
+>>>>>>> 92c8b42f2e3ffbb1ca84c95cb8dcbdc246fea141
