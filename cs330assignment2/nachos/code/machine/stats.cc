@@ -10,6 +10,7 @@
 #include "copyright.h"
 #include "utility.h"
 #include "stats.h"
+#include "../threads/system.h"
 
 //----------------------------------------------------------------------
 // Statistics::Statistics
@@ -25,7 +26,7 @@ Statistics::Statistics()
     numBursts = minBurst = maxBurst = totalBurst = 0;
     minCompletion = maxCompletion = totalCompletion = 0;
     squareCompletion = 0;
-    totalWait = waitCount = threadCount = 0;
+    totalWait = waitCount = threadCount = errorEstimate = 0;
 }
 
 //----------------------------------------------------------------------
@@ -46,8 +47,7 @@ Statistics::Print()
     printf("Network I/O: packets received %d, sent %d\n", numPacketsRecvd, 
 	numPacketsSent);
     double util = (totalBurst)/(double)totalTicks;
-    printf("NumBurst %d\n", numBursts);
-    printf("Number Of Threads: %d\n", threadCount);
+    printf("\nNumber Of Threads: %d\n", threadCount);
     printf("CPU Busy Time: %d\n", totalTicks-idleTicks);
     printf("Execution Time: %d\n", totalTicks);
     printf("CPU Utilization: %lf\n",util);
@@ -63,5 +63,8 @@ Statistics::Print()
         printf("Average Wait Time: %d\n", avg_wait);
         printf("Thread Completion: maximum %d, minimum %d, average %d, variance %lld\n",maxCompletion, minCompletion, totalCompletion, var_completion);
         
+    }
+    if(scheduler->GetPolicy()==2){
+        printf("Estimation Error: %lf\n", (double)errorEstimate/totalBurst);
     }
 }
