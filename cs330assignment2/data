@@ -1,0 +1,67 @@
+For policy 1,
+
+BATCH1
+Ticks: total 160175, idle 70015, system 7640, user 82520
+Disk I/O: reads 0, writes 0
+Console I/O: reads 0, writes 752
+Paging: faults 0
+Network I/O: packets received 0, sent 0
+NumBurst 723
+Number Of Threads: 10
+CPU Busy Time: 90160
+Execution Time: 160175
+CPU Utilization: 0.562822
+CPU Burst: maximum 2068, minimum 0, average 124
+Average Wait Time: 24354
+Thread Completion: maximum 160175, minimum 156765, average 159257, variance 3134700
+
+BATCH2
+Ticks: total 91338, idle 15566, system 2080, user 73692
+Disk I/O: reads 0, writes 0
+Console I/O: reads 0, writes 197
+Paging: faults 0
+Network I/O: packets received 0, sent 0
+NumBurst 171
+Number Of Threads: 9
+CPU Busy Time: 75772
+Execution Time: 91338
+CPU Utilization: 0.829469
+CPU Burst: maximum 2062, minimum 0, average 443
+Average Wait Time: 22239
+Thread Completion: maximum 91338, minimum 90458, average 90894, variance 626130
+
+BATCH3
+Ticks: total 78468, idle 4046, system 910, user 73512
+Disk I/O: reads 0, writes 0
+Console I/O: reads 0, writes 80
+Paging: faults 0
+Network I/O: packets received 0, sent 0
+NumBurst 54
+Number Of Threads: 9
+CPU Busy Time: 74422
+Execution Time: 78468
+CPU Utilization: 0.948310
+CPU Burst: maximum 2062, minimum 0, average 1378
+Average Wait Time: 22239
+Thread Completion: maximum 78468, minimum 77588, average 78024, variance 548937
+
+
+BATCH4
+Ticks: total 73054, idle 0, system 100, user 72954
+Disk I/O: reads 0, writes 0
+Console I/O: reads 0, writes 0
+Paging: faults 0
+Network I/O: packets received 0, sent 0
+NumBurst 9
+Number Of Threads: 9
+CPU Busy Time: 73054
+Execution Time: 73054
+CPU Utilization: 0.999863
+CPU Burst: maximum 8116, minimum 0, average 8116
+Average Wait Time: 32464
+Thread Completion: maximum 73054, minimum 8126, average 40586, variance 439589592
+
+
+For policy 1,
+
+BATCH1

@@ -91,6 +91,7 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>data</itemPath>
   </logicalFolder>
   <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
   <sourceRootList>
@@ -114,6 +115,8 @@
           <executablePath></executablePath>
         </makeTool>
       </makefileType>
+      <item path="data" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="nachos/c++example/inheritstack.cc" ex="false" tool="1" flavor2="4">
       </item>
       <item path="nachos/c++example/list.cc" ex="false" tool="1" flavor2="4">

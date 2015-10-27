@@ -155,6 +155,7 @@
         </df>
       </df>
     </df>
+    <itemPath>data</itemPath>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
