@@ -58,7 +58,7 @@ Scheduler::ReadyToRun (NachOSThread *thread)
     DEBUG('t', "Putting thread %s on ready list.\n", thread->getName());
     //printf("[pid %d] appended\n",thread->GetPID());
     thread->setStatus(READY);
-    if(policy==2 && thread->previous_burst >0 ){
+    if(policy==2 && thread->previous_burst > 0 ){
         float estimated_time = thread->estimated_burst + alpha*(thread->previous_burst - thread->estimated_burst);
         thread->estimated_burst = estimated_time;
         DEBUG('j',"[PID %d Estimated_Time %d]\n",thread->GetPID(),estimated_time);
@@ -181,16 +181,15 @@ Scheduler::Run (NachOSThread *nextThread, bool exit)
     currentThread->last_burst = stats->totalTicks;
     
     if(exit){
-        stats->threadCount++;
         stats->totalBurst += oldThread->cpu_burst;
         //printf("[Bursts %d %d %d]\n", oldThread->cpu_burst, stats->totalBurst, stats->totalTicks);
         stats->numBursts += oldThread->burst_count - oldThread->zero_burst;
         if(stats->maxCompletion < oldThread->end_time) stats->maxCompletion = oldThread->end_time;
         if(stats->minCompletion > oldThread->end_time || stats->minCompletion == 0) stats->minCompletion = oldThread->end_time;
         //printf("[stats->totalCompletion %d %d %d]\n",oldThread->GetPID(), oldThread->end_time, stats->totalCompletion);
-        stats->totalCompletion += oldThread->end_time;
+        stats->totalCompletion += oldThread->end_time/stats->threadCount;
         //printf("[stats->totalCompletion %d %d %d]\n",oldThread->GetPID(), oldThread->end_time, stats->totalCompletion);
-        long long int square_end = oldThread->end_time*oldThread->end_time;
+        long long int square_end = (oldThread->end_time/stats->threadCount)*(oldThread->end_time/stats->threadCount);
         //printf("[stats->squareCompletion %d %d %lld %lld]\n",oldThread->GetPID(),oldThread->end_time, square_end, stats->squareCompletion);
         stats->squareCompletion += square_end;
         //printf("[stats->squareCompletion %d %d %lld %lld]\n",oldThread->GetPID(),oldThread->end_time, square_end, stats->squareCompletion);
@@ -263,31 +262,31 @@ Scheduler::SetPolicy(int policy_value){
     policy = policy_value;
     switch(policy){
         case 1: // Non-preemptive default NachOS scheduling
-            quanta = 98;
+            quanta = 120;
             break;
         case 2: // Non-preemptive shortest next CPU burst first algorithm
-            quanta = 98;
+            quanta = 120;
             break;
         case 3: // Round-robin
-            quanta = 74;
+            quanta = 90;
             break;
         case 4: // Round-robin 
-            quanta = 49;
+            quanta = 60;
             break;
         case 5: // Round-robin 
-            quanta = 25;
+            quanta = 30;
             break;
         case 6: // Round-robin 
             quanta = 20;
             break;
         case 7: // UNIX Scheduler 
-            quanta = 74;
+            quanta = 90;
             break;
         case 8: // UNIX Scheduler 
-            quanta = 49;
+            quanta = 60;
             break;
         case 9: // UNIX Scheduler 
-            quanta = 25;
+            quanta = 30;
             break;
         case 10: // UNIX Scheduler 
             quanta = 20;

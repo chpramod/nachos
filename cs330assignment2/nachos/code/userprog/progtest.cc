@@ -95,12 +95,12 @@ void BatchProcess(char* filename){
                 thread = new NachOSThread(strdup(name));
                 thread->space = space;
                 if(priority[0]!='\0') thread->SetPriority(atoi(priority));
-                delete executable;			// close file
+                delete executable;
 
-                space->InitRegisters();		// set the initial register values
-                thread->SaveUserState();		// load page table register
-                thread->ThreadFork(ForkStartFunction, 0);	// Make it ready for a later context switch
-                
+                space->InitRegisters();
+                thread->SaveUserState();
+                thread->ThreadFork(ForkStartFunction, 0);
+                stats->threadCount++;
                 DEBUG('s',"%s %s\n",name,priority);
             }
             j=0;k=0;

@@ -37,20 +37,6 @@ Statistics::Statistics()
 void
 Statistics::Print()
 {   
-    if(threadCount>0){
-        int avg_completion = totalCompletion/threadCount;
-        long long int var_completion = squareCompletion/threadCount - (long long int)avg_completion*avg_completion;
-        double util = (totalBurst)/(double)totalTicks;
-        int avg_wait = totalWait/threadCount;
-        int avg_burst = totalBurst/numBursts;
-        printf("CPU Busy Time: %d\n", totalTicks-idleTicks);
-        printf("Execution Time: %d\n", totalTicks);
-        printf("CPU Utilization: %lf\n",util);
-        printf("CPU Burst: maximum %d, minimum %d, average %d\n", maxBurst, minBurst, avg_burst);
-        printf("Average Wait Time: %d\n", avg_wait);
-        printf("Thread Completion: maximum %d, minimum %d, average %d, variance %lld\n",maxCompletion, minCompletion, avg_completion, var_completion);
-        printf("Number Of Threads: %d\n", threadCount);
-    }
     printf("Ticks: total %d, idle %d, system %d, user %d\n", totalTicks, 
 	idleTicks, systemTicks, userTicks);
     printf("Disk I/O: reads %d, writes %d\n", numDiskReads, numDiskWrites);
@@ -59,4 +45,23 @@ Statistics::Print()
     printf("Paging: faults %d\n", numPageFaults);
     printf("Network I/O: packets received %d, sent %d\n", numPacketsRecvd, 
 	numPacketsSent);
+    double util = (totalBurst)/(double)totalTicks;
+    printf("NumBurst %d\n", numBursts);
+    printf("Number Of Threads: %d\n", threadCount);
+    printf("CPU Busy Time: %d\n", totalTicks-idleTicks);
+    printf("Execution Time: %d\n", totalTicks);
+    printf("CPU Utilization: %lf\n",util);
+    if(numBursts>0){
+        int avg_burst = totalBurst/numBursts;
+        printf("CPU Burst: maximum %d, minimum %d, average %d\n", maxBurst, minBurst, avg_burst);
+    }
+    if(threadCount>0){
+        int avg_completion = totalCompletion/threadCount;
+        long long int var_completion = squareCompletion/threadCount - (long long int)avg_completion*avg_completion;
+        var_completion*=threadCount*threadCount;
+        int avg_wait = totalWait/threadCount;
+        printf("Average Wait Time: %d\n", avg_wait);
+        printf("Thread Completion: maximum %d, minimum %d, average %d, variance %lld\n",maxCompletion, minCompletion, totalCompletion, var_completion);
+        
+    }
 }
