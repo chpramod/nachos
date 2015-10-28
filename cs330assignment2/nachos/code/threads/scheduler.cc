@@ -160,12 +160,12 @@ Scheduler::FindNextToRun ()
 void
 Scheduler::Run (NachOSThread *nextThread, bool exit)
 {
-    printf("[Run %d %d]\n",nextThread->GetPID(), stats->totalTicks);
+    /*printf("[Run %d %d]\n",nextThread->GetPID(), stats->totalTicks);
     if(stats->totalTicks >= 103645){
         for(int i=0;i<10;i++){
             if(exitThreadArray[i+1]==false) printf("[%s %d]\n",threadArray[i+1]->getName(),threadArray[1+i]->block_time);
         }
-    }
+    }*/
     NachOSThread *oldThread = currentThread;
     //printf("[pid %d] next [pid %d] old\n",nextThread->GetPID(), currentThread->GetPID());
 #ifdef USER_PROGRAM			// ignore until running user programs 

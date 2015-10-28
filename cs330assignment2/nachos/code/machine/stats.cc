@@ -67,7 +67,6 @@ Statistics::Print()
         
     }
     if(scheduler->GetPolicy()==2){
-        printf("HI %d\n",errorEstimate);
         printf("Estimation Error: %lf\n", (double)errorEstimate/totalBurst);
     }
 }
