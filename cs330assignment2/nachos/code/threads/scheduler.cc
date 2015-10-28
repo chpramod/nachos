@@ -197,15 +197,9 @@ Scheduler::Run (NachOSThread *nextThread, bool exit)
         stats->totalBurst += oldThread->cpu_burst;
         //printf("[Bursts %d %d %d]\n", oldThread->cpu_burst, stats->totalBurst, stats->totalTicks);
         stats->numBursts += oldThread->burst_count - oldThread->zero_burst;
+        stats->threadCompletion[oldThread->GetPID()-1] = oldThread->end_time;
         if(stats->maxCompletion < oldThread->end_time) stats->maxCompletion = oldThread->end_time;
         if(stats->minCompletion > oldThread->end_time || stats->minCompletion == 0) stats->minCompletion = oldThread->end_time;
-        //printf("[stats->totalCompletion %d %d %d]\n",oldThread->GetPID(), oldThread->end_time, stats->totalCompletion);
-        stats->totalCompletion += oldThread->end_time/stats->threadCount;
-        //printf("[stats->totalCompletion %d %d %d]\n",oldThread->GetPID(), oldThread->end_time, stats->totalCompletion);
-        long long int square_end = (oldThread->end_time/stats->threadCount)*(oldThread->end_time/stats->threadCount);
-        //printf("[stats->squareCompletion %d %d %lld %lld]\n",oldThread->GetPID(),oldThread->end_time, square_end, stats->squareCompletion);
-        stats->squareCompletion += square_end;
-        //printf("[stats->squareCompletion %d %d %lld %lld]\n",oldThread->GetPID(),oldThread->end_time, square_end, stats->squareCompletion);
         stats->totalWait += oldThread->wait_time;
         stats->totalBlock += oldThread->block_time;
     }

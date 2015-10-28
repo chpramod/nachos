@@ -273,18 +273,13 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
            printf("Assuming all programs completed.\n");
            if(stats->threadCount==0){
                 stats->threadCount++;
+                stats->threadCompletion = new int(1);
+                stats->threadCompletion[0] = end_time;
                 stats->totalBurst = cpu_burst;
                 //printf("[Bursts %d %d %d]\n", oldThread->cpu_burst, stats->totalBurst, stats->totalTicks);
                 stats->numBursts = burst_count - zero_burst;
                 stats->maxCompletion = end_time;
                 stats->minCompletion = end_time;
-                //printf("[stats->totalCompletion %d %d %d]\n",oldThread->GetPID(), oldThread->end_time, stats->totalCompletion);
-                stats->totalCompletion = end_time;
-                //printf("[stats->totalCompletion %d %d %d]\n",oldThread->GetPID(), oldThread->end_time, stats->totalCompletion);
-                long long int square_end = end_time*end_time;
-                //printf("[stats->squareCompletion %d %d %lld %lld]\n",oldThread->GetPID(),oldThread->end_time, square_end, stats->squareCompletion);
-                stats->squareCompletion = square_end;
-                //printf("[stats->squareCompletion %d %d %lld %lld]\n",oldThread->GetPID(),oldThread->end_time, square_end, stats->squareCompletion);
                 stats->totalWait = wait_time;
            }
            interrupt->Halt();

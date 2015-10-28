@@ -12,7 +12,6 @@
 #define STATS_H
 
 #include "copyright.h"
-
 // The following class defines the statistics that are to be kept
 // about Nachos behavior -- how much time (ticks) elapsed, how
 // many user instructions executed, etc.
@@ -49,6 +48,7 @@ class Statistics {
     int totalBlock;
     int threadCount;
     int errorEstimate;
+    int* threadCompletion;
     
     
     Statistics(); 		// initialize everything to zero

@@ -27,6 +27,7 @@ Statistics::Statistics()
     minCompletion = maxCompletion = totalCompletion = 0;
     squareCompletion = 0;
     totalWait = totalBlock = threadCount = errorEstimate = 0;
+    threadCompletion = NULL;
 }
 
 //----------------------------------------------------------------------
@@ -58,17 +59,22 @@ Statistics::Print()
         printf("CPU Burst: maximum %d, minimum %d, average %d\n", maxBurst, minBurst, avg_burst);
     }
     if(threadCount>0){
-        int avg_completion = totalCompletion/threadCount;
-        long long int var_completion = squareCompletion/threadCount - (long long int)avg_completion*avg_completion;
-        var_completion*=threadCount*threadCount;
+        for(int i=0;i<threadCount;i++) totalCompletion+=threadCompletion[i];
+        totalCompletion/= threadCount;
+        for(int i=0;i<threadCount;i++) squareCompletion+=(long long int)(totalCompletion - threadCompletion[i])*(long long int)(totalCompletion - threadCompletion[i]);
+        squareCompletion/=threadCount;
         int avg_wait = totalWait/threadCount;
         //int avg_block = totalBlock/threadCount;
         printf("Average Wait Time: %d\n", avg_wait);
         //printf("Average Block Time: %d\n", avg_block);
-        printf("Thread Completion: maximum %d, minimum %d, average %d, variance %lld\n",maxCompletion, minCompletion, totalCompletion, var_completion);
+        printf("Thread Completion: maximum %d, minimum %d, average %d, variance %lld\n",maxCompletion, minCompletion, totalCompletion, squareCompletion);
         
     }
     if(scheduler->GetPolicy()==2){
         printf("Estimation Error: %lf\n", (double)errorEstimate/totalBurst);
+    }
+    printf("\nThread Completion Time\n");
+    for(int i=0;i<threadCount;i++){
+        printf("Thread: %d, Completion Time: %d\n", i+1, threadCompletion[i]);
     }
 }
