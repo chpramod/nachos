@@ -26,7 +26,7 @@ Statistics::Statistics()
     numBursts = minBurst = maxBurst = totalBurst = 0;
     minCompletion = maxCompletion = totalCompletion = 0;
     squareCompletion = 0;
-    totalWait = waitCount = threadCount = errorEstimate = 0;
+    totalWait = totalBlock = threadCount = errorEstimate = 0;
 }
 
 //----------------------------------------------------------------------
@@ -60,11 +60,14 @@ Statistics::Print()
         long long int var_completion = squareCompletion/threadCount - (long long int)avg_completion*avg_completion;
         var_completion*=threadCount*threadCount;
         int avg_wait = totalWait/threadCount;
+        //int avg_block = totalBlock/threadCount;
         printf("Average Wait Time: %d\n", avg_wait);
+        //printf("Average Block Time: %d\n", avg_block);
         printf("Thread Completion: maximum %d, minimum %d, average %d, variance %lld\n",maxCompletion, minCompletion, totalCompletion, var_completion);
         
     }
     if(scheduler->GetPolicy()==2){
+        printf("HI %d\n",errorEstimate);
         printf("Estimation Error: %lf\n", (double)errorEstimate/totalBurst);
     }
 }

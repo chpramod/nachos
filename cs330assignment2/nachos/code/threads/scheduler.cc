@@ -55,26 +55,25 @@ Scheduler::~Scheduler()
 void
 Scheduler::ReadyToRun (NachOSThread *thread)
 {
+    //printf("[Ready %d %d]\n",thread->GetPID(), stats->totalTicks);
     DEBUG('t', "Putting thread %s on ready list.\n", thread->getName());
     //printf("[pid %d] appended\n",thread->GetPID());
     thread->setStatus(READY);
-    if(policy==2 && thread->previous_burst > 0 ){
-        float estimated_time = thread->estimated_burst + alpha*(thread->previous_burst - thread->estimated_burst);
-        if(thread->estimated_burst > thread->previous_burst) stats->errorEstimate+= thread->estimated_burst - thread->previous_burst;
-        else stats->errorEstimate+= thread->previous_burst - thread->estimated_burst;
-        thread->estimated_burst = estimated_time;
-        DEBUG('j',"[PID %d Estimated_Time %d]\n",thread->GetPID(),estimated_time);
-        readyList->SortedInsert((void*)thread,(int)estimated_time);
-    }
-    else if(policy==2 && thread->previous_burst == 0){
+    if(policy==2){
+        if(thread->previous_burst > 0){
+            float estimated_time = thread->estimated_burst + alpha*(thread->previous_burst - thread->estimated_burst);
+            if(thread->estimated_burst > thread->previous_burst) stats->errorEstimate+= thread->estimated_burst - thread->previous_burst;
+            else stats->errorEstimate+= thread->previous_burst - thread->estimated_burst;
+            //printf("[%d %d]\n",thread->GetPID(), stats->errorEstimate);
+            thread->estimated_burst = estimated_time;
+        }
+        DEBUG('j',"[PID %d Estimated_Time %f]\n",thread->GetPID(),thread->estimated_burst);
         readyList->SortedInsert((void*)thread,(int)thread->estimated_burst);
-    }
-    else if(policy>=7 && policy<=10){
-        readyList->Append((void*)thread);
     }
     else readyList->Append((void *)thread);
     thread->block_time = stats->totalTicks - thread->last_block;
     thread->last_wait = stats->totalTicks;
+    //Print();printf("\n");
 }
 
 //----------------------------------------------------------------------
@@ -118,19 +117,19 @@ Scheduler::FindNextToRun ()
 
             list_element = readyList->first;
             if (list_element == min_list_element) {
-                thread = (NachOSThread *)readyList->Remove();
+                thread = (NachOSThread* )readyList->Remove();
             }
             else{
-                ListElement* previous = list_element;
+                ListElement* list_temp = list_element;
                 list_element = list_element->next;
                 while(list_element!=NULL) {
                     if(list_element == min_list_element) {
-                        previous->next = list_element->next;
+                        list_temp->next = list_element->next;
                             if (list_element == readyList->last) {
-                            readyList->last = previous;
+                            readyList->last = list_temp;
                         }
                     }
-                    previous = list_element;
+                    list_temp = list_element;
                     list_element = list_element->next;
                 }
                 delete min_list_element;
@@ -141,7 +140,7 @@ Scheduler::FindNextToRun ()
         return thread;
 
     }
-    else return (NachOSThread *)readyList->Remove();
+    else return (NachOSThread* )readyList->Remove();
 }
 
 //----------------------------------------------------------------------
@@ -161,6 +160,12 @@ Scheduler::FindNextToRun ()
 void
 Scheduler::Run (NachOSThread *nextThread, bool exit)
 {
+    printf("[Run %d %d]\n",nextThread->GetPID(), stats->totalTicks);
+    if(stats->totalTicks >= 103645){
+        for(int i=0;i<10;i++){
+            if(exitThreadArray[i+1]==false) printf("[%s %d]\n",threadArray[i+1]->getName(),threadArray[1+i]->block_time);
+        }
+    }
     NachOSThread *oldThread = currentThread;
     //printf("[pid %d] next [pid %d] old\n",nextThread->GetPID(), currentThread->GetPID());
 #ifdef USER_PROGRAM			// ignore until running user programs 
@@ -178,11 +183,16 @@ Scheduler::Run (NachOSThread *nextThread, bool exit)
     
     DEBUG('t', "Switching from thread \"%s\" to thread \"%s\"\n",
 	  oldThread->getName(), nextThread->getName());
-    
+    //if(currentThread->GetPID()==1) printf("\t\t\t[WAIT %d %d",stats->totalTicks - currentThread->last_wait,currentThread->wait_time);
     currentThread->wait_time += stats->totalTicks - currentThread->last_wait;
+    //printf(" %d]\n", currentThread->wait_time);
     currentThread->last_burst = stats->totalTicks;
     
     if(exit){
+        float estimated_time = oldThread->estimated_burst + alpha*(oldThread->previous_burst - oldThread->estimated_burst);
+        if(oldThread->estimated_burst > oldThread->previous_burst) stats->errorEstimate+= oldThread->estimated_burst - oldThread->previous_burst;
+        else stats->errorEstimate+= oldThread->previous_burst - oldThread->estimated_burst;
+        
         stats->totalBurst += oldThread->cpu_burst;
         //printf("[Bursts %d %d %d]\n", oldThread->cpu_burst, stats->totalBurst, stats->totalTicks);
         stats->numBursts += oldThread->burst_count - oldThread->zero_burst;
@@ -196,6 +206,7 @@ Scheduler::Run (NachOSThread *nextThread, bool exit)
         stats->squareCompletion += square_end;
         //printf("[stats->squareCompletion %d %d %lld %lld]\n",oldThread->GetPID(),oldThread->end_time, square_end, stats->squareCompletion);
         stats->totalWait += oldThread->wait_time;
+        stats->totalBlock += oldThread->block_time;
     }
     // This is a machine-dependent assembly language routine defined 
     // in switch.s.  You may have to think

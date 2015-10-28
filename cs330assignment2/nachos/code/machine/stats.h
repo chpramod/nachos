@@ -46,7 +46,7 @@ class Statistics {
     int totalCompletion;
     long long int squareCompletion;
     int totalWait;
-    int waitCount;
+    int totalBlock;
     int threadCount;
     int errorEstimate;
     
