@@ -109,6 +109,7 @@ class NachOSThread {
 						// overflowed its stack
     void setStatus(ThreadStatus st) { status = st; }
     char* getName() { return (name); }
+    void setName(char* value) { name = value; }
     void Print() { printf("%s, ", name); }
 
     inline int GetPID (void) { return pid; }

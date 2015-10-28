@@ -64,7 +64,7 @@ void BatchProcess(char* filename){
     
     file->ReadAt(Buffer, (filelength-1), 0);
     DEBUG('s', "running batch jobs from \"%s\"\n", filename);
-  
+    currentThread->setName(strdup(filename));
     int i=0, j=0, k=0, policy=1;
     char name[100];
     char priority[10];

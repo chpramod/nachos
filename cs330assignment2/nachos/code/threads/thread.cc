@@ -331,7 +331,6 @@ NachOSThread::YieldCPU ()
     if((stats->minBurst > previous_burst && previous_burst > 0) || stats->minBurst == 0) stats->minBurst = previous_burst;
     last_burst = stats->totalTicks;
     last_round_robin+= previous_burst;
-    
     if(scheduler->GetPolicy()<=2){
         nextThread = scheduler->FindNextToRun();
         if (nextThread != NULL) {
@@ -339,7 +338,7 @@ NachOSThread::YieldCPU ()
             scheduler->Run(nextThread);
         }
     }
-    else if(scheduler->GetPolicy()>=3 && scheduler->GetPolicy()<=6){
+    else if(scheduler->GetPolicy()>=3 && scheduler->GetPolicy()<=6){\
         if(last_round_robin >= scheduler->GetQuanta()){
             nextThread = scheduler->FindNextToRun();
             if (nextThread != NULL) {

@@ -44,10 +44,12 @@ Statistics::Print()
     printf("Console I/O: reads %d, writes %d\n", numConsoleCharsRead, 
 	numConsoleCharsWritten);
     printf("Paging: faults %d\n", numPageFaults);
-    printf("Network I/O: packets received %d, sent %d\n", numPacketsRecvd, 
+    printf("Network I/O: packets received %d, sent %d\n\n", numPacketsRecvd, 
 	numPacketsSent);
+    printf("[%s]\n", currentThread->getName());
+    printf("Scheduling Policy: %d\n", scheduler->GetPolicy());
     double util = (totalBurst)/(double)totalTicks;
-    printf("\nNumber Of Threads: %d\n", threadCount);
+    printf("Number Of Threads: %d\n", threadCount);
     printf("CPU Busy Time: %d\n", totalTicks-idleTicks);
     printf("Execution Time: %d\n", totalTicks);
     printf("CPU Utilization: %lf\n",util);
