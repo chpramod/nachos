@@ -48,10 +48,10 @@ Statistics::Print()
 	numPacketsSent);
     printf("[%s]\n", currentThread->getName());
     printf("Scheduling Policy: %d\n", scheduler->GetPolicy());
-    double util = (totalBurst)/(double)totalTicks;
+    double util = (totalBurst)/(double)(totalTicks-currentThread->cpu_burst);
     printf("Number Of Threads: %d\n", threadCount);
-    printf("CPU Busy Time: %d\n", totalTicks-idleTicks);
-    printf("Execution Time: %d\n", totalTicks);
+    printf("CPU Busy Time: %d\n", totalTicks-idleTicks-currentThread->cpu_burst);
+    printf("Execution Time: %d\n", (totalTicks-currentThread->cpu_burst));
     printf("CPU Utilization: %lf\n",util);
     if(numBursts>0){
         int avg_burst = totalBurst/numBursts;
