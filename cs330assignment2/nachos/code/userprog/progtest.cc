@@ -110,7 +110,6 @@ void BatchProcess(char* filename){
             i++;j++;
         }
     }
-    stats->threadCompletion = new int(stats->threadCount);
     exitThreadArray[currentThread->GetPID()] = true;
     currentThread->PutThreadToSleep();
     currentThread->Exit(true,0);

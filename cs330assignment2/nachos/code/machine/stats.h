@@ -48,7 +48,7 @@ class Statistics {
     int totalBlock;
     int threadCount;
     int errorEstimate;
-    int* threadCompletion;
+    int threadCompletion[1000];
     
     
     Statistics(); 		// initialize everything to zero

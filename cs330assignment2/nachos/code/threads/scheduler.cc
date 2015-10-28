@@ -197,7 +197,7 @@ Scheduler::Run (NachOSThread *nextThread, bool exit)
         stats->totalBurst += oldThread->cpu_burst;
         //printf("[Bursts %d %d %d]\n", oldThread->cpu_burst, stats->totalBurst, stats->totalTicks);
         stats->numBursts += oldThread->burst_count - oldThread->zero_burst;
-        stats->threadCompletion[oldThread->GetPID()-1] = oldThread->end_time;
+        stats->threadCompletion[oldThread->GetPID()] = oldThread->end_time;
         if(stats->maxCompletion < oldThread->end_time) stats->maxCompletion = oldThread->end_time;
         if(stats->minCompletion > oldThread->end_time || stats->minCompletion == 0) stats->minCompletion = oldThread->end_time;
         stats->totalWait += oldThread->wait_time;

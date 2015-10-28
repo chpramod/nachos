@@ -271,10 +271,8 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
            DEBUG('i', "Machine idle.  No interrupts to do.\n");
            printf("\nNo threads ready or runnable, and no pending interrupts.\n");
            printf("Assuming all programs completed.\n");
+           stats->threadCompletion[pid] = end_time;
            if(stats->threadCount==0){
-                stats->threadCount++;
-                stats->threadCompletion = new int(1);
-                stats->threadCompletion[0] = end_time;
                 stats->totalBurst = cpu_burst;
                 //printf("[Bursts %d %d %d]\n", oldThread->cpu_burst, stats->totalBurst, stats->totalTicks);
                 stats->numBursts = burst_count - zero_burst;
