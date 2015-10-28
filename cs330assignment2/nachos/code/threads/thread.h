@@ -152,6 +152,7 @@ class NachOSThread {
     int last_wait; // last time of wait start
     int last_block; // last time of block start
     int cpu_count; // Used to calculate priority in UNIX Scheduler
+    int last_round_robin; // Used to schedule in Round Robin Scheme
     
   private:
     // some of the private data for this class is listed above

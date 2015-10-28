@@ -73,6 +73,7 @@ NachOSThread::NachOSThread(char* threadName)
     last_wait = 0;
     last_block = 0;
     cpu_count = 0;
+    last_round_robin = 0;
 }
 
 //----------------------------------------------------------------------
@@ -329,6 +330,7 @@ NachOSThread::YieldCPU ()
     if(stats->maxBurst < previous_burst && previous_burst > 0) stats->maxBurst = previous_burst;
     if((stats->minBurst > previous_burst && previous_burst > 0) || stats->minBurst == 0) stats->minBurst = previous_burst;
     last_burst = stats->totalTicks;
+    last_round_robin+= previous_burst;
     
     if(scheduler->GetPolicy()<=2){
         nextThread = scheduler->FindNextToRun();
@@ -338,13 +340,13 @@ NachOSThread::YieldCPU ()
         }
     }
     else if(scheduler->GetPolicy()>=3 && scheduler->GetPolicy()<=6){
-        if(stats->totalTicks-last_burst >= scheduler->GetQuanta()){
+        if(last_round_robin >= scheduler->GetQuanta()){
             nextThread = scheduler->FindNextToRun();
             if (nextThread != NULL) {
                 scheduler->ReadyToRun(this);
                 scheduler->Run(nextThread);
             }
-        } 
+        }
     }
     else{
         nextThread = scheduler->FindNextToRun();

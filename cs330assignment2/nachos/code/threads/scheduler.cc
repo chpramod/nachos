@@ -187,6 +187,7 @@ Scheduler::Run (NachOSThread *nextThread, bool exit)
     currentThread->wait_time += stats->totalTicks - currentThread->last_wait;
     //printf(" %d]\n", currentThread->wait_time);
     currentThread->last_burst = stats->totalTicks;
+    currentThread->last_round_robin = 0;
     
     if(exit){
         float estimated_time = oldThread->estimated_burst + alpha*(oldThread->previous_burst - oldThread->estimated_burst);

@@ -1,0 +1,55 @@
+[Ready 1 10]
+Ready list contents:
+../test/testloop1|1, 
+[Ready 2 10]
+Ready list contents:
+../test/testloop1|1, ../test/testloop1|2, 
+[Ready 3 10]
+Ready list contents:
+../test/testloop1|1, ../test/testloop1|2, ../test/testloop1|3, 
+[Ready 4 10]
+Ready list contents:
+../test/testloop1|1, ../test/testloop1|2, ../test/testloop1|3, ../test/testloop1|4, 
+[Ready 5 10]
+Ready list contents:
+../test/testloop1|1, ../test/testloop1|2, ../test/testloop1|3, ../test/testloop1|4, ../test/testloop1|5, 
+[Ready 6 10]
+Ready list contents:
+../test/testloop1|1, ../test/testloop1|2, ../test/testloop1|3, ../test/testloop1|4, ../test/testloop1|5, ../test/testloop1|6, 
+[Ready 7 10]
+Ready list contents:
+../test/testloop1|1, ../test/testloop1|2, ../test/testloop1|3, ../test/testloop1|4, ../test/testloop1|5, ../test/testloop1|6, ../test/testloop1|7, 
+[Ready 8 10]
+Ready list contents:
+../test/testloop1|1, ../test/testloop1|2, ../test/testloop1|3, ../test/testloop1|4, ../test/testloop1|5, ../test/testloop1|6, ../test/testloop1|7, ../test/testloop1|8, 
+[Ready 9 10]
+Ready list contents:
+../test/testloop1|1, ../test/testloop1|2, ../test/testloop1|3, ../test/testloop1|4, ../test/testloop1|5, ../test/testloop1|6, ../test/testloop1|7, ../test/testloop1|8, ../test/testloop1|9, 
+[Ready 10 10]
+Ready list contents:
+../test/testloop1|1, ../test/testloop1|2, ../test/testloop1|3, ../test/testloop1|4, ../test/testloop1|5, ../test/testloop1|6, ../test/testloop1|7, ../test/testloop1|8, ../test/testloop1|9, ../test/testloop1|0, 
+[Run 1 10]
+[../test/testloop1|1 10]
+[../test/testloop1|2 10]
+[../test/testloop1|3 10]
+[../test/testloop1|4 10]
+[../test/testloop1|5 10]
+[../test/testloop1|6 10]
+[../test/testloop1|7 10]
+[../test/testloop1|8 10]
+[../test/testloop1|9 10]
+[../test/testloop1|0 10]
+[Ready 1 258]
+Ready list contents:
+../test/testloop1|3, ../test/testloop1|4, ../test/testloop1|5, ../test/testloop1|6, ../test/testloop1|7, ../test/testloop1|8, ../test/testloop1|9, ../test/testloop1|0, ../test/testloop1|1, 
+[Run 2 258]
+[../test/testloop1|1 258]
+[../test/testloop1|2 10]
+[../test/testloop1|3 10]
+[../test/testloop1|4 10]
+[../test/testloop1|5 10]
+[../test/testloop1|6 10]
+[../test/testloop1|7 10]
+[../test/testloop1|8 10]
+[../test/testloop1|9 10]
+[../test/testloop1|0 10]
