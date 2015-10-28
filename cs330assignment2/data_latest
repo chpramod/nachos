@@ -1,0 +1,423 @@
+Batch1
+Scheduling Policy: 1
+Number Of Threads: 10
+CPU Busy Time: 90160
+Execution Time: 160175
+CPU Utilization: 0.562822
+CPU Burst: maximum 2068, minimum 10, average 124
+Average Wait Time: 24354
+Thread Completion: maximum 160175, minimum 156765, average 159257, variance 3134700
+
+Batch2
+Scheduling Policy: 1
+Number Of Threads: 10
+CPU Busy Time: 84190
+Execution Time: 101485
+CPU Utilization: 0.829482
+CPU Burst: maximum 2062, minimum 10, average 443
+Average Wait Time: 24300
+Thread Completion: maximum 101485, minimum 100495, average 100985, variance 1109600
+
+Batch3
+Scheduling Policy: 1
+Number Of Threads: 10
+CPU Busy Time: 82690
+Execution Time: 87185
+CPU Utilization: 0.948328
+CPU Burst: maximum 2062, minimum 10, average 1378
+Average Wait Time: 24300
+Thread Completion: maximum 87185, minimum 86195, average 86685, variance 966600
+
+Batch4
+Scheduling Policy: 1
+Number Of Threads: 10
+CPU Busy Time: 81170
+Execution Time: 81170
+CPU Utilization: 0.999877
+CPU Burst: maximum 8116, minimum 10, average 8116
+Average Wait Time: 36522
+Thread Completion: maximum 81170, minimum 8126, average 44644, variance 543812600
+
+Batch5
+Scheduling Policy: 1
+Number Of Threads: 10
+CPU Busy Time: 61730
+Execution Time: 61730
+CPU Utilization: 0.999838
+CPU Burst: maximum 2036, minimum 10, average 1234
+Average Wait Time: 55395
+Thread Completion: maximum 61730, minimum 61424, average 61573, variance 379100
+
+Batch1
+Scheduling Policy: 2
+Number Of Threads: 10
+CPU Busy Time: 90160
+Execution Time: 160175
+CPU Utilization: 0.562822
+CPU Burst: maximum 2068, minimum 10, average 124
+Average Wait Time: 24354
+Thread Completion: maximum 160175, minimum 156765, average 159257, variance 3134700
+Estimation Error: 0.837393
+
+Batch2
+Scheduling Policy: 2
+Number Of Threads: 10
+CPU Busy Time: 84190
+Execution Time: 101485
+CPU Utilization: 0.829482
+CPU Burst: maximum 2062, minimum 10, average 443
+Average Wait Time: 24300
+Thread Completion: maximum 101485, minimum 100495, average 100985, variance 1109600
+Estimation Error: 0.887859
+
+Batch3
+Scheduling Policy: 2
+Number Of Threads: 10
+CPU Busy Time: 82690
+Execution Time: 87185
+CPU Utilization: 0.948328
+CPU Burst: maximum 2062, minimum 10, average 1378
+Average Wait Time: 24300
+Thread Completion: maximum 87185, minimum 86195, average 86685, variance 966600
+Estimation Error: 0.784107
+
+Batch4
+Scheduling Policy: 2
+Number Of Threads: 10
+CPU Busy Time: 81170
+Execution Time: 81170
+CPU Utilization: 0.999877
+CPU Burst: maximum 8116, minimum 10, average 8116
+Average Wait Time: 36522
+Thread Completion: maximum 81170, minimum 8126, average 44644, variance 543812600
+Estimation Error: 0.985214
+
+Batch5
+Scheduling Policy: 2
+Number Of Threads: 10
+CPU Busy Time: 61730
+Execution Time: 61730
+CPU Utilization: 0.999838
+CPU Burst: maximum 2036, minimum 10, average 1234
+Average Wait Time: 40140
+Thread Completion: maximum 61730, minimum 30914, average 46318, variance 236059000
+Estimation Error: 0.658296
+
+Batch1
+Scheduling Policy: 3
+Number Of Threads: 10
+CPU Busy Time: 101970
+Execution Time: 166707
+CPU Utilization: 0.611612
+CPU Burst: maximum 99, minimum 10, average 53
+Average Wait Time: 77880
+Thread Completion: maximum 166707, minimum 158047, average 164812, variance 7188000
+
+Batch2
+Scheduling Policy: 3
+Number Of Threads: 10
+CPU Busy Time: 94830
+Execution Time: 108397
+CPU Utilization: 0.874747
+CPU Burst: maximum 97, minimum 10, average 75
+Average Wait Time: 77677
+Thread Completion: maximum 108397, minimum 100857, average 106816, variance 5938700
+Batch3
+Scheduling Policy: 3
+Number Of Threads: 10
+CPU Busy Time: 93000
+Execution Time: 93815
+CPU Utilization: 0.991206
+CPU Burst: maximum 97, minimum 10, average 84
+Average Wait Time: 77769
+Thread Completion: maximum 93815, minimum 83959, average 90785, variance 11475100
+
+Batch4
+Scheduling Policy: 3
+Number Of Threads: 10
+CPU Busy Time: 91310
+Execution Time: 91310
+CPU Utilization: 0.999890
+CPU Burst: maximum 90, minimum 10, average 89
+Average Wait Time: 81834
+Thread Completion: maximum 91310, minimum 90136, average 90970, variance 157900
+
+Batch1
+Scheduling Policy: 4
+Number Of Threads: 10
+CPU Busy Time: 113140
+Execution Time: 177554
+CPU Utilization: 0.637158
+CPU Burst: maximum 88, minimum 10, average 37
+Average Wait Time: 80784
+Thread Completion: maximum 177554, minimum 159074, average 173458, variance 37037000
+
+Batch2
+Scheduling Policy: 4
+Number Of Threads: 10
+CPU Busy Time: 101930
+Execution Time: 114598
+CPU Utilization: 0.889370
+CPU Burst: maximum 88, minimum 10, average 51
+Average Wait Time: 82943
+Thread Completion: maximum 114598, minimum 104758, average 112586, variance 9150100
+
+Batch3
+Scheduling Policy: 4
+Number Of Threads: 10
+CPU Busy Time: 99250
+Execution Time: 100081
+CPU Utilization: 0.991597
+CPU Burst: maximum 88, minimum 10, average 57
+Average Wait Time: 82442
+Thread Completion: maximum 100081, minimum 89628, average 96857, variance 12191800
+
+Batch4
+Scheduling Policy: 4
+Number Of Threads: 10
+CPU Busy Time: 97390
+Execution Time: 97390
+CPU Utilization: 0.999897
+CPU Burst: maximum 88, minimum 10, average 59
+Average Wait Time: 87453
+Thread Completion: maximum 97390, minimum 96676, average 97197, variance 1421900
+
+Batch1
+Scheduling Policy: 5
+Number Of Threads: 10
+CPU Busy Time: 138100
+Execution Time: 202785
+CPU Utilization: 0.680968
+CPU Burst: maximum 88, minimum 10, average 25
+Average Wait Time: 107714
+Thread Completion: maximum 202785, minimum 177225, average 198736, variance 57197100
+
+Batch2
+Scheduling Policy: 5
+Number Of Threads: 10
+CPU Busy Time: 126600
+Execution Time: 138992
+CPU Utilization: 0.910772
+CPU Burst: maximum 88, minimum 10, average 28
+Average Wait Time: 106670
+Thread Completion: maximum 138992, minimum 116694, average 135416, variance 44619800
+
+Batch3
+Scheduling Policy: 5
+Number Of Threads: 10
+CPU Busy Time: 123880
+Execution Time: 125068
+CPU Utilization: 0.990421
+CPU Burst: maximum 88, minimum 10, average 29
+Average Wait Time: 106074
+Thread Completion: maximum 125068, minimum 112014, average 122371, variance 14548700
+
+Batch4
+Scheduling Policy: 5
+Number Of Threads: 10
+CPU Busy Time: 121700
+Execution Time: 121700
+CPU Utilization: 0.999918
+CPU Burst: maximum 88, minimum 10, average 29
+Average Wait Time: 109341
+Thread Completion: maximum 121700, minimum 120686, average 121516, variance 1538900
+
+Batch1
+Scheduling Policy: 6
+Number Of Threads: 10
+CPU Busy Time: 179220
+Execution Time: 242572
+CPU Utilization: 0.738791
+CPU Burst: maximum 88, minimum 10, average 18
+Average Wait Time: 143709
+Thread Completion: maximum 242572, minimum 200572, average 237086, variance 154557700
+
+Batch2
+Scheduling Policy: 6
+Number Of Threads: 10
+CPU Busy Time: 167510
+Execution Time: 179472
+CPU Utilization: 0.933293
+CPU Burst: maximum 88, minimum 10, average 19
+Average Wait Time: 142889
+Thread Completion: maximum 179472, minimum 155372, average 175356, variance 54431700
+
+Batch3
+Scheduling Policy: 6
+Number Of Threads: 10
+CPU Busy Time: 164710
+Execution Time: 165762
+CPU Utilization: 0.993593
+CPU Burst: maximum 88, minimum 10, average 19
+Average Wait Time: 142356
+Thread Completion: maximum 165762, minimum 151712, average 163059, variance 19243500
+
+Batch4
+Scheduling Policy: 6
+Number Of Threads: 10
+CPU Busy Time: 162190
+Execution Time: 162190
+CPU Utilization: 0.999938
+CPU Burst: maximum 88, minimum 10, average 19
+Average Wait Time: 145719
+Thread Completion: maximum 162190, minimum 160696, average 161943, variance 1150200
+
+Batch1
+Scheduling Policy: 7
+Number Of Threads: 10
+CPU Busy Time: 101890
+Execution Time: 154679
+CPU Utilization: 0.658654
+CPU Burst: maximum 97, minimum 10, average 53
+Average Wait Time: 68520
+Thread Completion: maximum 154679, minimum 120699, average 145734, variance 137570200
+
+Batch2
+Scheduling Policy: 7
+Number Of Threads: 10
+CPU Busy Time: 94710
+Execution Time: 96878
+CPU Utilization: 0.977518
+CPU Burst: maximum 90, minimum 10, average 75
+Average Wait Time: 65706
+Thread Completion: maximum 96878, minimum 77888, average 85725, variance 40767400
+
+Batch3
+Scheduling Policy: 7
+Number Of Threads: 10
+CPU Busy Time: 93020
+Execution Time: 93288
+CPU Utilization: 0.997020
+CPU Burst: maximum 95, minimum 10, average 84
+Average Wait Time: 65264
+Thread Completion: maximum 93288, minimum 66548, average 76913, variance 106875100
+
+Batch4
+Scheduling Policy: 7
+Number Of Threads: 10
+CPU Busy Time: 91310
+Execution Time: 91310
+CPU Utilization: 0.999890
+CPU Burst: maximum 90, minimum 10, average 89
+Average Wait Time: 62913
+Thread Completion: maximum 91310, minimum 63676, average 72050, variance 158326700
+
+Batch1
+Scheduling Policy: 8
+Number Of Threads: 10
+CPU Busy Time: 110780
+Execution Time: 144746
+CPU Utilization: 0.765272
+CPU Burst: maximum 88, minimum 10, average 39
+Average Wait Time: 67394
+Thread Completion: maximum 144746, minimum 97946, average 124568, variance 324750100
+
+Batch2
+Scheduling Policy: 8
+Number Of Threads: 10
+CPU Busy Time: 101170
+Execution Time: 103370
+CPU Utilization: 0.978620
+CPU Burst: maximum 88, minimum 10, average 53
+Average Wait Time: 67033
+Thread Completion: maximum 103370, minimum 63029, average 80872, variance 203087900
+
+Batch3
+Scheduling Policy: 8
+Number Of Threads: 10
+CPU Busy Time: 99190
+Execution Time: 99365
+CPU Utilization: 0.998138
+CPU Burst: maximum 88, minimum 10, average 57
+Average Wait Time: 66538
+Thread Completion: maximum 99365, minimum 60149, average 77730, variance 199382400
+
+Batch4
+Scheduling Policy: 8
+Number Of Threads: 10
+CPU Busy Time: 97390
+Execution Time: 97390
+CPU Utilization: 0.999897
+CPU Burst: maximum 88, minimum 10, average 59
+Average Wait Time: 64267
+Thread Completion: maximum 97390, minimum 58434, average 74012, variance 362088200
+
+Batch1
+Scheduling Policy: 9
+Number Of Threads: 10
+CPU Busy Time: 136290
+Execution Time: 161898
+CPU Utilization: 0.841765
+CPU Burst: maximum 88, minimum 10, average 25
+Average Wait Time: 79384
+Thread Completion: maximum 161898, minimum 105127, average 131421, variance 673953700
+
+Batch2
+Scheduling Policy: 9
+Number Of Threads: 10
+CPU Busy Time: 135750
+Execution Time: 137185
+CPU Utilization: 0.989467
+CPU Burst: maximum 88, minimum 10, average 28
+Average Wait Time: 86164
+Thread Completion: maximum 137185, minimum 68342, average 105169, variance 748461900
+
+Batch3
+Scheduling Policy: 9
+Number Of Threads: 10
+CPU Busy Time: 133200
+Execution Time: 133458
+CPU Utilization: 0.997992
+CPU Burst: maximum 88, minimum 10, average 29
+Average Wait Time: 87723
+Thread Completion: maximum 133458, minimum 62790, average 102710, variance 770925600
+
+Batch4
+Scheduling Policy: 9
+Number Of Threads: 10
+CPU Busy Time: 121700
+Execution Time: 121700
+CPU Utilization: 0.999918
+CPU Burst: maximum 88, minimum 10, average 29
+Average Wait Time: 79061
+Thread Completion: maximum 121700, minimum 60864, average 91236, variance 920781300
+
+Batch1
+Scheduling Policy: 10
+Number Of Threads: 10
+CPU Busy Time: 234345
+Execution Time: 243273
+CPU Utilization: 0.963259
+CPU Burst: maximum 88, minimum 10, average 18
+Average Wait Time: 125198
+Thread Completion: maximum 243273, minimum 113983, average 175191, variance 2317639300
+
+Batch2
+Scheduling Policy: 10
+Number Of Threads: 10
+CPU Busy Time: 218190
+Execution Time: 219914
+CPU Utilization: 0.992115
+CPU Burst: maximum 88, minimum 10, average 19
+Average Wait Time: 134762
+Thread Completion: maximum 219914, minimum 88871, average 161874, variance 1951249500
+
+Batch3
+Scheduling Policy: 10
+Number Of Threads: 10
+CPU Busy Time: 214270
+Execution Time: 214621
+CPU Utilization: 0.998318
+CPU Burst: maximum 88, minimum 10, average 19
+Average Wait Time: 136492
+Thread Completion: maximum 214621, minimum 84000, average 159948, variance 2009863600
+
+Batch4
+Scheduling Policy: 10
+Number Of Threads: 10
+CPU Busy Time: 97366
+Execution Time: 97366
+CPU Utilization: 0.999897
+CPU Burst: maximum 88, minimum 10, average 19
+Average Wait Time: 73107
+Thread Completion: maximum 97366, minimum 81114, average 82847, variance 24569000
