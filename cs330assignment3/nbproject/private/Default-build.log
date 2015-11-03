@@ -1,0 +1,4 @@
+cd threads; gmake depend
+/bin/sh: 1: gmake: not found
+Makefile:9: recipe for target 'all' failed
+make: *** [all] Error 127
