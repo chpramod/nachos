@@ -9,17 +9,6 @@
     </data>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/home/vicky/csecourses/cs330assignment2/nachos/code/userprog/progtest.cc</file>
-            <file>file:/home/vicky/csecourses/cs330assignment2/nachos/code/machine/interrupt.h</file>
-            <file>file:/home/vicky/csecourses/cs330assignment2/nachos/code/userprog/exception.cc</file>
-            <file>file:/home/vicky/csecourses/cs330assignment2/nachos/code/threads/thread.cc</file>
-            <file>file:/home/vicky/csecourses/cs330assignment2/nachos/code/machine/timer.h</file>
-            <file>file:/home/vicky/csecourses/cs330assignment2/nachos/code/threads/thread.h</file>
-            <file>file:/home/vicky/csecourses/cs330assignment2/nachos/code/threads/system.cc</file>
-            <file>file:/home/vicky/csecourses/cs330assignment2/nachos/code/threads/synch.cc</file>
-            <file>file:/home/vicky/csecourses/cs330assignment2/nachos/code/threads/scheduler.cc</file>
-            <file>file:/home/vicky/csecourses/cs330assignment2/nachos/code/machine/stats.cc</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>
