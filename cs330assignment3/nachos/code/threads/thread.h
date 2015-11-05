@@ -151,6 +151,8 @@ class NachOSThread {
 
     void SetUsage (int usage);
     int GetUsage (void);
+    
+    int ShmAllocate(int size);
 
   private:
     // some of the private data for this class is listed above

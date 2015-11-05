@@ -4,13 +4,30 @@ int
 main()
 {
     int x;
+    int *array = (int*)system_ShmAllocate(3*sizeof(int));
+    array[0] = 1;
+    array[1] = 2;
+    array[2] = 3;
     int sleep_start, sleep_end;
 
     system_PrintString("Parent PID: ");
     system_PrintInt(system_GetPID());
     system_PrintChar('\n');
+        system_PrintInt(array[0]);
+    system_PrintChar('\n');
+        system_PrintInt(array[1]);
+    system_PrintChar('\n');
+        system_PrintInt(array[2]);
+    system_PrintChar('\n');
     x = system_Fork();
     if (x == 0) {
+        array[0] = 3;
+        system_PrintInt(array[0]);
+    system_PrintChar('\n');
+        system_PrintInt(array[1]);
+    system_PrintChar('\n');
+        system_PrintInt(array[2]);
+    system_PrintChar('\n');
        system_PrintString("Child PID: ");
        system_PrintInt(system_GetPID());
        system_PrintChar('\n');
@@ -31,6 +48,13 @@ main()
        system_PrintString(" instructions.\n");
     }
     else {
+        system_Sleep(1000000);
+        system_PrintInt(array[0]);
+    system_PrintChar('\n');
+        system_PrintInt(array[1]);
+    system_PrintChar('\n');
+        system_PrintInt(array[2]);
+    system_PrintChar('\n');
        system_PrintString("Parent after fork waiting for child: ");
        system_PrintInt(x);
        system_PrintChar('\n');

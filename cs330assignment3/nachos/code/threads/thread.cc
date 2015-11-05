@@ -403,6 +403,11 @@ NachOSThread::PutThreadToSleep ()
     scheduler->Run(nextThread); // returns when we've been signalled
 }
 
+int
+NachOSThread::ShmAllocate(int size){
+    return space->ShmAllocate(size);
+}
+
 //----------------------------------------------------------------------
 // ThreadFinish, InterruptEnable, ThreadPrint
 //	Dummy functions because C++ does not allow a pointer to a member
