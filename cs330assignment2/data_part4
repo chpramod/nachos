@@ -1,0 +1,60 @@
+[[Round Robin]]
+
+Ticks: total 164484, idle 64524, system 17440, user 82520
+Disk I/O: reads 0, writes 0
+Console I/O: reads 0, writes 739
+Paging: faults 0
+Network I/O: packets received 0, sent 0
+
+[Batch6]
+Scheduling Policy: 3
+Number Of Threads: 10
+CPU Busy Time: 99950
+Execution Time: 164474
+CPU Utilization: 0.607695
+CPU Burst: maximum 103, minimum 10, average 58
+Average Wait Time: 76166
+Thread Completion: maximum 164484, minimum 157484, average 162941, variance 4563381
+
+Thread Completion Time
+Thread: 1, Completion Time: 157484
+Thread: 2, Completion Time: 162264
+Thread: 3, Completion Time: 164484
+Thread: 4, Completion Time: 164044
+Thread: 5, Completion Time: 164264
+Thread: 6, Completion Time: 163264
+Thread: 7, Completion Time: 164374
+Thread: 8, Completion Time: 160814
+Thread: 9, Completion Time: 163934
+Thread: 10, Completion Time: 162934
+
+
+[[UNIX Scheduler]]
+
+Ticks: total 137666, idle 37586, system 17560, user 82520
+Disk I/O: reads 0, writes 0
+Console I/O: reads 0, writes 750
+Paging: faults 0
+Network I/O: packets received 0, sent 0
+
+[Batch6]
+Scheduling Policy: 7
+Number Of Threads: 10
+CPU Busy Time: 100070
+Execution Time: 137656
+CPU Utilization: 0.726957
+CPU Burst: maximum 100, minimum 10, average 57
+Average Wait Time: 51967
+Thread Completion: maximum 137666, minimum 72636, average 123716, variance 310478266
+
+Thread Completion Time
+Thread: 1, Completion Time: 137666
+Thread: 2, Completion Time: 136996
+Thread: 3, Completion Time: 135996
+Thread: 4, Completion Time: 133446
+Thread: 5, Completion Time: 130556
+Thread: 6, Completion Time: 124216
+Thread: 7, Completion Time: 113556
+Thread: 8, Completion Time: 106216
+Thread: 9, Completion Time: 80853
+Thread: 10, Completion Time: 72636

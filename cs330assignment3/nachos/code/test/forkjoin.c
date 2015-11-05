@@ -20,8 +20,9 @@ main()
         system_PrintInt(array[2]);
     system_PrintChar('\n');
     x = system_Fork();
+    array[1] = 4;
     if (x == 0) {
-        array[0] = 3;
+        array[0] = 5;
         system_PrintInt(array[0]);
     system_PrintChar('\n');
         system_PrintInt(array[1]);

@@ -136,7 +136,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
 AddrSpace::AddrSpace(AddrSpace *parentSpace)
 {
     numPages = parentSpace->GetNumPages();
-    unsigned i, size = numPages * PageSize;
+    unsigned i,j, sharedPages;
 
     ASSERT(numPages+numPagesAllocated <= NumPhysPages);                // check we're not trying
                                                                                 // to run anything too big --
@@ -144,18 +144,17 @@ AddrSpace::AddrSpace(AddrSpace *parentSpace)
                                                                                 // virtual memory
 
     DEBUG('a', "Initializing address space, num pages %d, size %d\n",
-                                        numPages, size);
+                                        numPages, numPages*PageSize);
     // first, set up the translation
     TranslationEntry* parentPageTable = parentSpace->GetPageTable();
     pageTable = new TranslationEntry[numPages];
-    int pages = numPages;
-    for (i = 0; i < numPages; i++) {
+    for (i = 0, sharedPages = 0; i < numPages; i++) {
         pageTable[i].virtualPage = i;
         if(parentPageTable[i].shared){
             pageTable[i].physicalPage = parentPageTable[i].physicalPage;
-            pages--;
+            sharedPages++;
         }
-        else pageTable[i].physicalPage = i+numPagesAllocated;
+        else pageTable[i].physicalPage = i-sharedPages+numPagesAllocated;
         pageTable[i].valid = parentPageTable[i].valid;
         pageTable[i].use = parentPageTable[i].use;
         pageTable[i].dirty = parentPageTable[i].dirty;
@@ -166,15 +165,19 @@ AddrSpace::AddrSpace(AddrSpace *parentSpace)
     }
 
     // Copy the contents
-    unsigned startAddrParent = parentPageTable[0].physicalPage*PageSize;
-    unsigned startAddrChild = numPagesAllocated*PageSize;
-    size = pages*PageSize;
-    for (i=0; i<size; i++) {
-       machine->mainMemory[startAddrChild+i] = machine->mainMemory[startAddrParent+i];
+    unsigned startAddrParent,startAddrChild;
+    for (i=0; i<numPages; i++) {
+        if(!pageTable[i].shared){
+            startAddrParent = parentPageTable[i].physicalPage*PageSize;
+            startAddrChild = pageTable[i].physicalPage*PageSize;
+            for(j=0;j<PageSize;j++){
+                machine->mainMemory[startAddrChild+j] = machine->mainMemory[startAddrParent+j];
+            }
+        }
     }
 
     //numPagesAllocated += numPages;
-    numPagesAllocated += pages;
+    numPagesAllocated += numPages-sharedPages;
 }
 
 int
@@ -194,11 +197,15 @@ AddrSpace::ShmAllocate(int size){
 	pageTable[i].readOnly = FALSE;
         pageTable[i].shared = TRUE;
     }
+    
+    bzero(&machine->mainMemory[numPagesAllocated*PageSize], extraPages*PageSize);
+    
     numPages += extraPages;
+    numPagesAllocated += extraPages;
     delete oldPageTable;
     machine->pageTable = pageTable;
     machine->pageTableSize = numPages;
-    return pageTable[numPages-extraPages].physicalPage*PageSize;
+    return (unsigned)(numPages-extraPages)*PageSize;
 }
 
 //----------------------------------------------------------------------

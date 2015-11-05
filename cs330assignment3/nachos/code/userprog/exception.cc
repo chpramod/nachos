@@ -302,7 +302,7 @@ ExceptionHandler(ExceptionType which)
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
     }
     else if ((which == SyscallException) && (type == syscall_ShmAllocate)) {
-        machine->WriteRegister(2,currentThread->ShmAllocate(machine->ReadRegister(4)));
+        machine->WriteRegister(2,(unsigned)currentThread->ShmAllocate(machine->ReadRegister(4)));
         machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
         machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
         machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
