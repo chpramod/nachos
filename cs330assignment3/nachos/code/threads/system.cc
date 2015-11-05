@@ -7,7 +7,7 @@
 
 #include "copyright.h"
 #include "system.h"
-
+#include "synch.h"
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
 
@@ -35,6 +35,11 @@ int *priority;				// Process priority
 int cpu_burst_start_time;        // Records the start of current CPU burst
 int completionTimeArray[MAX_THREAD_COUNT];        // Records the completion time of all simulated threads
 bool excludeMainThread;		// Used by completion time statistics calculation
+
+Semaphore *semaphoreArray[MAX_SEMAPHORE_COUNT]; // Array of semaphore pointers
+int semaphoreKey[MAX_SEMAPHORE_COUNT]; // Stores semaphore key corresponding to each semaphore id
+unsigned semaphore_index; // Index into this array (also used to assign unique semaphore)
+
 
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;
@@ -134,6 +139,8 @@ Initialize(int argc, char **argv)
     thread_index = 0;
 
     sleepQueueHead = NULL;
+    
+    semaphore_index = 0;
 
 #ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program

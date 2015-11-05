@@ -9,7 +9,10 @@ main()
     array[1] = 2;
     array[2] = 3;
     int sleep_start, sleep_end;
-
+    int id = system_SemGet(2);
+    system_PrintInt(id);
+    id = system_SemGet(3);
+    system_PrintInt(id);
     system_PrintString("Parent PID: ");
     system_PrintInt(system_GetPID());
     system_PrintChar('\n');
@@ -23,6 +26,7 @@ main()
     array[1] = 4;
     if (x == 0) {
         array[0] = 5;
+    system_SemOp(id,-1);
         system_PrintInt(array[0]);
     system_PrintChar('\n');
         system_PrintInt(array[1]);
@@ -47,9 +51,11 @@ main()
        system_PrintString("Child executed ");
        system_PrintInt(system_GetNumInstr());
        system_PrintString(" instructions.\n");
+    system_SemOp(id,1);
     }
     else {
-        system_Sleep(1000000);
+        //system_Sleep(1000000);
+    system_SemOp(id,-1);
         system_PrintInt(array[0]);
     system_PrintChar('\n');
         system_PrintInt(array[1]);
@@ -63,6 +69,7 @@ main()
        system_PrintString("Parent executed ");
        system_PrintInt(system_GetNumInstr());
        system_PrintString(" instructions.\n");
+    system_SemOp(id,1);
     }
     return 0;
 }

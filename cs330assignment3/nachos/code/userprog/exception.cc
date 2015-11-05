@@ -303,10 +303,49 @@ ExceptionHandler(ExceptionType which)
     }
     else if ((which == SyscallException) && (type == syscall_ShmAllocate)) {
         machine->WriteRegister(2,(unsigned)currentThread->ShmAllocate(machine->ReadRegister(4)));
+        
         machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
         machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
         machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    } else {
+    }
+    else if ((which == SyscallException) && (type == syscall_SemGet)) {
+        int j,id,key = machine->ReadRegister(4);
+        for(j=0;j<MAX_SEMAPHORE_COUNT;j++){
+            if(semaphoreKey[j]==key){
+                id = j;
+                break;
+            }
+        }
+        if(j==MAX_SEMAPHORE_COUNT){
+            semaphoreArray[semaphore_index] = new Semaphore("A",1);
+            semaphoreKey[semaphore_index] = key;
+            id = semaphore_index;
+            semaphore_index++;
+        }
+        machine->WriteRegister(2,id);
+        
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if ((which == SyscallException) && (type == syscall_SemOp)) {
+        int id = machine->ReadRegister(4);
+        int adjust = machine->ReadRegister(5);
+        if(adjust==-1) semaphoreArray[id]->P();
+        else if(adjust==1) semaphoreArray[id]->V();
+        
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if ((which == SyscallException) && (type == syscall_SemCtl)) {
+        
+        
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else {
 	printf("Unexpected user mode exception %d %d\n", which, type);
 	ASSERT(FALSE);
     }
