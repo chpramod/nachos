@@ -37,8 +37,12 @@ int completionTimeArray[MAX_THREAD_COUNT];        // Records the completion time
 bool excludeMainThread;		// Used by completion time statistics calculation
 
 Semaphore *semaphoreArray[MAX_SEMAPHORE_COUNT]; // Array of semaphore pointers
-int semaphoreKey[MAX_SEMAPHORE_COUNT]; // Stores semaphore key corresponding to each semaphore id
+int semaphoreKey[MAX_SEMAPHORE_COUNT]; // Stores semaphore keys corresponding to each semaphore id
 unsigned semaphore_index; // Index into this array (also used to assign unique semaphore)
+
+Condition *conditionArray[MAX_CONDITION_COUNT]; // Array of condition variable pointers
+int conditionKey[MAX_CONDITION_COUNT]; // Stores condition variable keys corresponding to each condition variable id
+unsigned condition_index; // Index into this array (also used to assign unique condition variable)
 
 
 #ifdef FILESYS_NEEDED
@@ -142,6 +146,9 @@ Initialize(int argc, char **argv)
     
     for (i=0; i<MAX_SEMAPHORE_COUNT; i++) { semaphoreArray[i] = NULL; semaphoreKey[i] = -1; }
     semaphore_index = 0;
+    
+    for (i=0; i<MAX_CONDITION_COUNT; i++) { conditionArray[i] = NULL; conditionKey[i] = -1; }
+    condition_index = 0;
 
 #ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program

@@ -133,8 +133,13 @@ class Condition {
     void Broadcast(Lock *conditionLock);// the currentThread for all of 
 					// these operations
 
+    void Wait(Semaphore* mutex);
+    void Signal();
+    void Broadcast();
+
   private:
     char* name;
+    List* queue;
     // plus some other stuff you'll need to define
 };
 #endif // SYNCH_H

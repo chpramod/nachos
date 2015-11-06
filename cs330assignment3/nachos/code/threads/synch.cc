@@ -115,8 +115,41 @@ Lock::~Lock() {}
 void Lock::Acquire() {}
 void Lock::Release() {}
 
-Condition::Condition(char* debugName) { }
-Condition::~Condition() { }
+Condition::Condition(char* debugName) {
+    queue = new List;
+}
+Condition::~Condition() {
+    delete queue;
+}
 void Condition::Wait(Lock* conditionLock) { ASSERT(FALSE); }
 void Condition::Signal(Lock* conditionLock) { }
 void Condition::Broadcast(Lock* conditionLock) { }
+
+void
+Condition::Wait(Semaphore *mutex) {
+    mutex->V();
+    queue->Append((void*)currentThread);
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);
+    currentThread->PutThreadToSleep();
+    (void) interrupt->SetLevel(oldLevel);
+    mutex->P();
+}
+
+void 
+Condition::Signal() {
+    NachOSThread* thread = (NachOSThread*)queue->Remove();
+    if (thread != NULL) scheduler->ReadyToRun(thread);
+}
+
+void
+Condition::Broadcast() {
+    NachOSThread* thread;
+    thread = (NachOSThread*)queue->Remove();
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);
+    while(thread != NULL){
+        scheduler->ReadyToRun(thread);
+        thread = (NachOSThread*)queue->Remove();
+    }
+    (void) interrupt->SetLevel(oldLevel);
+}
+

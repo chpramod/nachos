@@ -309,7 +309,8 @@ ExceptionHandler(ExceptionType which)
         machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
     }
     else if ((which == SyscallException) && (type == syscall_SemGet)) {
-        int j,id,key = machine->ReadRegister(4);
+        unsigned j,id;
+        int key = machine->ReadRegister(4);
         for(j=0;j<MAX_SEMAPHORE_COUNT;j++){
             if(semaphoreKey[j]==key){
                 id = j;
@@ -317,10 +318,12 @@ ExceptionHandler(ExceptionType which)
             }
         }
         if(j==MAX_SEMAPHORE_COUNT){
+            IntStatus oldLevel = interrupt->SetLevel(IntOff);
             semaphoreArray[semaphore_index] = new Semaphore(strdup(currentThread->getName()),1);
             semaphoreKey[semaphore_index] = key;
             id = semaphore_index;
             semaphore_index++;
+            (void) interrupt->SetLevel(oldLevel);
         }
         machine->WriteRegister(2,id);
         
@@ -329,9 +332,9 @@ ExceptionHandler(ExceptionType which)
         machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
     }
     else if ((which == SyscallException) && (type == syscall_SemOp)) {
-        int id = machine->ReadRegister(4);
+        unsigned id = machine->ReadRegister(4);
         int adjust = machine->ReadRegister(5);
-        if(semaphoreKey[id!=-1]){
+        if(semaphoreKey[id]!=-1 && id<semaphore_index){
             if(adjust==-1) semaphoreArray[id]->P();
             else if(adjust==1) semaphoreArray[id]->V();
         }
@@ -341,11 +344,11 @@ ExceptionHandler(ExceptionType which)
         machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
     }
     else if ((which == SyscallException) && (type == syscall_SemCtl)) {
-        int id = machine->ReadRegister(4);
+        unsigned id = machine->ReadRegister(4);
         int command = machine->ReadRegister(5);
         vaddr = machine->ReadRegister(6);
         int value;
-        if(semaphoreKey[id]!=-1){
+        if(semaphoreKey[id]!=-1 && id<semaphore_index){
             if(command==SYNCH_REMOVE){
                 delete semaphoreArray[id];
                 semaphoreKey[id]=-1;
@@ -365,6 +368,67 @@ ExceptionHandler(ExceptionType which)
                 else machine->WriteRegister(2,-1);
             }
             else machine->WriteRegister(2,-1);
+        }
+        else machine->WriteRegister(2,-1);
+        
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if ((which == SyscallException) && (type == syscall_CondGet)) {
+        unsigned j,id;
+        int key = machine->ReadRegister(4);
+        for(j=0;j<MAX_CONDITION_COUNT;j++){
+            if(conditionKey[j]==key){
+                id = j;
+                break;
+            }
+        }
+        if(j==MAX_CONDITION_COUNT){
+            IntStatus oldLevel = interrupt->SetLevel(IntOff);
+            conditionArray[condition_index] = new Condition(strdup(currentThread->getName()));
+            conditionKey[condition_index] = key;
+            id = condition_index;
+            condition_index++;
+            (void) interrupt->SetLevel(oldLevel);
+        }
+        machine->WriteRegister(2,id);
+        
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if ((which == SyscallException) && (type == syscall_CondOp)) {
+        unsigned cond = machine->ReadRegister(4);
+        int op = machine->ReadRegister(5);
+        unsigned sem = machine->ReadRegister(6);
+        if(conditionKey[cond]!=-1 && cond<condition_index){
+            if(op==COND_OP_WAIT && semaphoreKey[sem]!=-1){
+                conditionArray[cond]->Wait(semaphoreArray[sem]);
+                machine->WriteRegister(2,0);
+            }
+            else if(op==COND_OP_SIGNAL){
+                conditionArray[cond]->Signal();
+                machine->WriteRegister(2,0);
+            }
+            else if(op==COND_OP_BROADCAST){
+                conditionArray[cond]->Broadcast();
+                machine->WriteRegister(2,0);
+            }
+            else machine->WriteRegister(2,-1);
+        }
+        else machine->WriteRegister(2,-1);
+        
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if ((which == SyscallException) && (type == syscall_CondRemove)) {
+        unsigned id = machine->ReadRegister(4);
+        if(conditionKey[id]!=-1 && id<condition_index){
+            delete conditionArray[id];
+            conditionKey[id]=-1;
+            machine->WriteRegister(2,0);
         }
         else machine->WriteRegister(2,-1);
         
