@@ -334,7 +334,7 @@ ExceptionHandler(ExceptionType which)
     else if ((which == SyscallException) && (type == syscall_SemOp)) {
         unsigned id = machine->ReadRegister(4);
         int adjust = machine->ReadRegister(5);
-        if(semaphoreKey[id]!=-1 && id<semaphore_index){
+        if(semaphoreArray[id]!=NULL && id<semaphore_index){
             if(adjust==-1) semaphoreArray[id]->P();
             else if(adjust==1) semaphoreArray[id]->V();
         }
@@ -348,7 +348,7 @@ ExceptionHandler(ExceptionType which)
         int command = machine->ReadRegister(5);
         vaddr = machine->ReadRegister(6);
         int value;
-        if(semaphoreKey[id]!=-1 && id<semaphore_index){
+        if(semaphoreArray[id]!=NULL && id<semaphore_index){
             if(command==SYNCH_REMOVE){
                 delete semaphoreArray[id];
                 semaphoreKey[id]=-1;
@@ -402,7 +402,7 @@ ExceptionHandler(ExceptionType which)
         unsigned cond = machine->ReadRegister(4);
         int op = machine->ReadRegister(5);
         unsigned sem = machine->ReadRegister(6);
-        if(conditionKey[cond]!=-1 && cond<condition_index){
+        if(conditionArray[cond]!=NULL && cond<condition_index){
             if(op==COND_OP_WAIT && semaphoreKey[sem]!=-1){
                 conditionArray[cond]->Wait(semaphoreArray[sem]);
                 machine->WriteRegister(2,0);
@@ -425,7 +425,7 @@ ExceptionHandler(ExceptionType which)
     }
     else if ((which == SyscallException) && (type == syscall_CondRemove)) {
         unsigned id = machine->ReadRegister(4);
-        if(conditionKey[id]!=-1 && id<condition_index){
+        if(conditionArray[id]!=NULL && id<condition_index){
             delete conditionArray[id];
             conditionKey[id]=-1;
             machine->WriteRegister(2,0);
