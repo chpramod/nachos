@@ -140,6 +140,7 @@ Initialize(int argc, char **argv)
 
     sleepQueueHead = NULL;
     
+    for (i=0; i<MAX_SEMAPHORE_COUNT; i++) { semaphoreArray[i] = NULL; semaphoreKey[i] = -1; }
     semaphore_index = 0;
 
 #ifdef USER_PROGRAM

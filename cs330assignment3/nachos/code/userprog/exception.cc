@@ -317,7 +317,7 @@ ExceptionHandler(ExceptionType which)
             }
         }
         if(j==MAX_SEMAPHORE_COUNT){
-            semaphoreArray[semaphore_index] = new Semaphore("A",1);
+            semaphoreArray[semaphore_index] = new Semaphore(strdup(currentThread->getName()),1);
             semaphoreKey[semaphore_index] = key;
             id = semaphore_index;
             semaphore_index++;
@@ -331,15 +331,42 @@ ExceptionHandler(ExceptionType which)
     else if ((which == SyscallException) && (type == syscall_SemOp)) {
         int id = machine->ReadRegister(4);
         int adjust = machine->ReadRegister(5);
-        if(adjust==-1) semaphoreArray[id]->P();
-        else if(adjust==1) semaphoreArray[id]->V();
+        if(semaphoreKey[id!=-1]){
+            if(adjust==-1) semaphoreArray[id]->P();
+            else if(adjust==1) semaphoreArray[id]->V();
+        }
         
         machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
         machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
         machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
     }
     else if ((which == SyscallException) && (type == syscall_SemCtl)) {
-        
+        int id = machine->ReadRegister(4);
+        int command = machine->ReadRegister(5);
+        vaddr = machine->ReadRegister(6);
+        int value;
+        if(semaphoreKey[id]!=-1){
+            if(command==SYNCH_REMOVE){
+                delete semaphoreArray[id];
+                semaphoreKey[id]=-1;
+                machine->WriteRegister(2,0);
+            }
+            else if(command==SYNCH_GET){
+                if(machine->WriteMem(vaddr,sizeof(int),semaphoreArray[id]->GetValue())) machine->WriteRegister(2,0);
+                else machine->WriteRegister(2,-1);
+            }
+            else if(command==SYNCH_SET){
+                if(machine->ReadMem(vaddr,sizeof(int),&value)){
+                    IntStatus oldLevel = interrupt->SetLevel(IntOff);
+                    semaphoreArray[id]->SetValue(value);
+                    (void) interrupt->SetLevel(oldLevel);
+                    machine->WriteRegister(2,0);
+                }
+                else machine->WriteRegister(2,-1);
+            }
+            else machine->WriteRegister(2,-1);
+        }
+        else machine->WriteRegister(2,-1);
         
         machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
         machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
