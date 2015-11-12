@@ -15,6 +15,7 @@
 
 #include "copyright.h"
 #include "filesys.h"
+#include "noff.h"
 
 #define UserStackSize		1024 	// increase this as necessary!
 
@@ -40,6 +41,7 @@ class AddrSpace {
 
     TranslationEntry* GetPageTable();
 
+    NoffHeader noffH;
   private:
     TranslationEntry *pageTable;	// Assume linear page table translation
 					// for now!

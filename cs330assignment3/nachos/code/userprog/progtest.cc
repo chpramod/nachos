@@ -40,7 +40,8 @@ StartProcess(char *filename)
     }
     space = new AddrSpace(executable);    
     currentThread->space = space;
-
+    currentThread->filename = strdup(filename);
+    
     delete executable;			// close file
 
     space->InitRegisters();		// set the initial register values
@@ -167,6 +168,7 @@ ReadInputAndFork (char *filename)
       child->SaveUserState ();
       child->ThreadStackAllocate (BatchStartFunction, 0);
       child->Schedule ();
+      child->filename = batchProcesses[i];
       //printf("Created %d\n", i);
    }
 

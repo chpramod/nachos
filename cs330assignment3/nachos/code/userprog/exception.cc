@@ -164,6 +164,7 @@ ExceptionHandler(ExceptionType which)
        child->ResetReturnValue ();			     // Sets the return register to zero
        child->ThreadStackAllocate (ForkStartFunction, 0);	// Make it ready for a later context switch
        child->Schedule ();
+       child->filename = currentThread->filename;
        machine->WriteRegister(2, child->GetPID());		// Return value for parent
     }
     else if ((which == SyscallException) && (type == syscall_Yield)) {
@@ -435,6 +436,10 @@ ExceptionHandler(ExceptionType which)
         machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
         machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
         machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if (which == PageFaultException){
+        currentThread->SortedInsertInWaitQueue (1000+stats->totalTicks); 
+        stats->numPageFaults++;
     }
     else {
 	printf("Unexpected user mode exception %d %d\n", which, type);

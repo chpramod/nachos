@@ -18,7 +18,6 @@
 #include "copyright.h"
 #include "system.h"
 #include "addrspace.h"
-#include "noff.h"
 
 //----------------------------------------------------------------------
 // SwapHeader
@@ -59,7 +58,6 @@ SwapHeader (NoffHeader *noffH)
 
 AddrSpace::AddrSpace(OpenFile *executable)
 {
-    NoffHeader noffH;
     unsigned int i, size;
     unsigned vpn, offset;
     TranslationEntry *entry;
@@ -89,8 +87,8 @@ AddrSpace::AddrSpace(OpenFile *executable)
     pageTable = new TranslationEntry[numPages];
     for (i = 0; i < numPages; i++) {
 	pageTable[i].virtualPage = i;
-	pageTable[i].physicalPage = i+numPagesAllocated;
-	pageTable[i].valid = TRUE;
+	pageTable[i].physicalPage = -1;
+	pageTable[i].valid = FALSE;
 	pageTable[i].use = FALSE;
 	pageTable[i].dirty = FALSE;
 	pageTable[i].readOnly = FALSE;
@@ -100,12 +98,12 @@ AddrSpace::AddrSpace(OpenFile *executable)
     }
 // zero out the entire address space, to zero the unitialized data segment 
 // and the stack segment
-    bzero(&machine->mainMemory[numPagesAllocated*PageSize], size);
+    //bzero(&machine->mainMemory[numPagesAllocated*PageSize], size);
  
-    numPagesAllocated += numPages;
+    //numPagesAllocated += numPages;
 
 // then, copy in the code and data segments into memory
-    if (noffH.code.size > 0) {
+    /*if (noffH.code.size > 0) {
         DEBUG('a', "Initializing code segment, at 0x%x, size %d\n", 
 			noffH.code.virtualAddr, noffH.code.size);
         vpn = noffH.code.virtualAddr/PageSize;
@@ -124,7 +122,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
         pageFrame = entry->physicalPage;
         executable->ReadAt(&(machine->mainMemory[pageFrame * PageSize + offset]),
 			noffH.initData.size, noffH.initData.inFileAddr);
-    }
+    }*/
 
 }
 
@@ -136,7 +134,8 @@ AddrSpace::AddrSpace(OpenFile *executable)
 AddrSpace::AddrSpace(AddrSpace *parentSpace)
 {
     numPages = parentSpace->GetNumPages();
-    unsigned i,j, sharedPages;
+    noffH = parentSpace->noffH;
+    unsigned i,j,validPages, sharedPages;
 
     ASSERT(numPages+numPagesAllocated <= NumPhysPages);                // check we're not trying
                                                                                 // to run anything too big --
@@ -148,13 +147,17 @@ AddrSpace::AddrSpace(AddrSpace *parentSpace)
     // first, set up the translation
     TranslationEntry* parentPageTable = parentSpace->GetPageTable();
     pageTable = new TranslationEntry[numPages];
-    for (i = 0, sharedPages = 0; i < numPages; i++) {
+    for (i = 0, validPages=0, sharedPages = 0; i < numPages; i++) {
         pageTable[i].virtualPage = i;
         if(parentPageTable[i].shared){
             pageTable[i].physicalPage = parentPageTable[i].physicalPage;
             sharedPages++;
         }
-        else pageTable[i].physicalPage = i-sharedPages+numPagesAllocated;
+        else if(parentPageTable[i].valid){
+            pageTable[i].physicalPage = validPages+numPagesAllocated;
+            validPages++;
+        }
+        else pageTable[i].physicalPage = -1;
         pageTable[i].valid = parentPageTable[i].valid;
         pageTable[i].use = parentPageTable[i].use;
         pageTable[i].dirty = parentPageTable[i].dirty;
@@ -167,7 +170,7 @@ AddrSpace::AddrSpace(AddrSpace *parentSpace)
     // Copy the contents
     unsigned startAddrParent,startAddrChild;
     for (i=0; i<numPages; i++) {
-        if(!pageTable[i].shared){
+        if(!pageTable[i].shared && pageTable[i].valid){
             startAddrParent = parentPageTable[i].physicalPage*PageSize;
             startAddrChild = pageTable[i].physicalPage*PageSize;
             for(j=0;j<PageSize;j++){
@@ -177,7 +180,7 @@ AddrSpace::AddrSpace(AddrSpace *parentSpace)
     }
 
     //numPagesAllocated += numPages;
-    numPagesAllocated += numPages-sharedPages;
+    numPagesAllocated += validPages;
 }
 
 int
@@ -202,6 +205,7 @@ AddrSpace::ShmAllocate(int size){
     
     numPages += extraPages;
     numPagesAllocated += extraPages;
+    stats->numPageFaults += extraPages;
     delete oldPageTable;
     machine->pageTable = pageTable;
     machine->pageTableSize = numPages;

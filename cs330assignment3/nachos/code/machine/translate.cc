@@ -216,8 +216,9 @@ Machine::Translate(int virtAddr, int* physAddr, int size, bool writing)
 	} else if (!pageTable[vpn].valid) {
 	    DEBUG('a', "virtual page # %d too large for page table size %d!\n", 
 			virtAddr, pageTableSize);
-	    return PageFaultException;
+	    if(!PageFaultHandler(virtAddr)) return PageFaultException;
 	}
+        //if(!pageTable[vpn].valid) PageFaultHandler(virtAddr);
 	entry = &pageTable[vpn];
     } else {
         for (entry = NULL, i = 0; i < TLBSize; i++)
@@ -277,4 +278,28 @@ Machine::GetPA (unsigned vaddr)
       return pageFrame * PageSize + offset;
    }
    else return -1;
+}
+
+bool
+Machine::PageFaultHandler(int vaddr){
+    unsigned vpn, offset;
+    TranslationEntry *entry;
+    unsigned int pageFrame;
+    vpn = vaddr/PageSize;
+    OpenFile *executable = fileSystem->Open(currentThread->filename);
+    NoffHeader noffH = currentThread->space->noffH;
+    if(executable==NULL){
+        return FALSE;
+    }
+    bzero(&machine->mainMemory[numPagesAllocated*PageSize], PageSize);
+    vpn = vaddr/PageSize;
+    offset = vaddr%PageSize;
+    entry = &pageTable[vpn];
+    entry->physicalPage = numPagesAllocated++;
+    entry->valid = TRUE;
+    pageFrame = entry->physicalPage;
+    executable->ReadAt(&(machine->mainMemory[pageFrame * PageSize]),
+                    PageSize, noffH.code.inFileAddr + vpn*PageSize);
+    RaiseException(PageFaultException,NULL);
+    return TRUE;
 }

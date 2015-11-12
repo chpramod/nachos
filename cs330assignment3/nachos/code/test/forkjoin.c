@@ -54,7 +54,7 @@ main()
     system_SemOp(id,1);
     }
     else {
-        //system_Sleep(1000000);
+        system_Sleep(1000000);
     system_SemOp(id,-1);
         system_PrintInt(array[0]);
     system_PrintChar('\n');

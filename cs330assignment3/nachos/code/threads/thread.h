@@ -154,6 +154,7 @@ class NachOSThread {
     
     int ShmAllocate(int size);
 
+    char* filename;
   private:
     // some of the private data for this class is listed above
     
