@@ -165,7 +165,7 @@ ExceptionHandler(ExceptionType which)
        child->ResetReturnValue ();			     // Sets the return register to zero
        child->ThreadStackAllocate (ForkStartFunction, 0);	// Make it ready for a later context switch
        child->Schedule ();
-       child->filename = currentThread->filename;
+       child->filename = strdup(currentThread->filename);
        machine->WriteRegister(2, child->GetPID());		// Return value for parent
     }
     else if ((which == SyscallException) && (type == syscall_Yield)) {

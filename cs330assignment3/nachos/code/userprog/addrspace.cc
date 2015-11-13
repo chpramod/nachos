@@ -81,7 +81,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
 										// at least until we have
 										// virtual memory
 
-    DEBUG('a', "Initializing address space, num pages %d, size %d\n", 
+    DEBUG('n', "Initializing address space, num pages %d, size %d\n", 
 					numPages, size);
 // first, set up the translation 
     pageTable = new TranslationEntry[numPages];
@@ -142,7 +142,7 @@ AddrSpace::AddrSpace(AddrSpace *parentSpace)
                                                                                 // at least until we have
                                                                                 // virtual memory
 
-    DEBUG('z', "Initializing address space, num pages %d, size %d\n",
+    DEBUG('n', "Initializing address space, num pages %d, size %d\n",
                                         numPages, numPages*PageSize);
     // first, set up the translation
     TranslationEntry* parentPageTable = parentSpace->GetPageTable();

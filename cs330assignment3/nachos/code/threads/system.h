@@ -37,8 +37,8 @@
 #define GET_NICE_FROM_PARENT	-1
 
 
-#define MAX_SEMAPHORE_COUNT 4000
-#define MAX_CONDITION_COUNT 4000
+#define MAX_SEMAPHORE_COUNT 4096
+#define MAX_CONDITION_COUNT 4096
 
 // Initialization and cleanup routines
 extern void Initialize(int argc, char **argv); 	// Initialization,
