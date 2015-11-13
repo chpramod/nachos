@@ -61,6 +61,8 @@ Machine::Machine(bool debug)
     mainMemory = new char[MemorySize];
     for (i = 0; i < MemorySize; i++)
       	mainMemory[i] = 0;
+    for (i = 0; i < NumPhysPages; i++)
+        pageArray[i] = -1;
 
 #ifdef USE_TLB
     tlb = new TranslationEntry[TLBSize];

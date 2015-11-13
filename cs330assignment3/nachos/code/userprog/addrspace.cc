@@ -59,9 +59,9 @@ SwapHeader (NoffHeader *noffH)
 AddrSpace::AddrSpace(OpenFile *executable)
 {
     unsigned int i, size;
-    unsigned vpn, offset;
-    TranslationEntry *entry;
-    unsigned int pageFrame;
+    //unsigned vpn, offset;
+    //TranslationEntry *entry;
+    //unsigned int pageFrame;
 
     executable->ReadAt((char *)&noffH, sizeof(noffH), 0);
     if ((noffH.noffMagic != NOFFMAGIC) && 
@@ -155,6 +155,7 @@ AddrSpace::AddrSpace(AddrSpace *parentSpace)
         }
         else if(parentPageTable[i].valid){
             pageTable[i].physicalPage = validPages+numPagesAllocated;
+            machine->pageArray[pageTable[i].physicalPage] = currentThread->GetPID();
             validPages++;
         }
         else pageTable[i].physicalPage = -1;
@@ -194,6 +195,7 @@ AddrSpace::ShmAllocate(int size){
     for (i = numPages; i < numPages + extraPages; i++){
         pageTable[i].virtualPage = i;
 	pageTable[i].physicalPage = i-numPages+numPagesAllocated;
+        machine->pageArray[pageTable[i].physicalPage] = currentThread->GetPID();
 	pageTable[i].valid = TRUE;
 	pageTable[i].use = FALSE;
 	pageTable[i].dirty = FALSE;
@@ -214,12 +216,19 @@ AddrSpace::ShmAllocate(int size){
 
 //----------------------------------------------------------------------
 // AddrSpace::~AddrSpace
-// 	Dealloate an address space.  Nothing for now!
+// 	Deallocate an address space.  Nothing for now!
 //----------------------------------------------------------------------
 
 AddrSpace::~AddrSpace()
-{
-   delete pageTable;
+{   
+    for (int i = 0; i < numPages; i++){
+        if(pageTable[i].valid && !pageTable[i].shared){
+            machine->pageArray[pageTable[i].physicalPage] = -1; // Page marked as free
+            DEBUG('z',"\t\t\t[%d]\n",pageTable[i].physicalPage);
+        }
+    }
+    
+    delete pageTable;
 }
 
 //----------------------------------------------------------------------

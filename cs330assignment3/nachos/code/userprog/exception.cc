@@ -54,7 +54,7 @@ static Semaphore *writeDone;
 static void ReadAvail(int arg) { readAvail->V(); }
 static void WriteDone(int arg) { writeDone->V(); }
 
-extern void StartProcess (char*);
+extern void StartExec (char*);
 
 void
 ForkStartFunction (int dummy)
@@ -129,7 +129,8 @@ ExceptionHandler(ExceptionType which)
           machine->ReadMem(vaddr, 1, &memval);
        }
        buffer[i] = (*(char*)&memval);
-       StartProcess(buffer);
+       //threadToBeDestroyed = currentThread;
+       StartExec(buffer);
     }
     else if ((which == SyscallException) && (type == syscall_Join)) {
        waitpid = machine->ReadRegister(4);

@@ -162,6 +162,8 @@ class Machine {
 				// code and data, while executing
  
     int registers[NumTotalRegs]; // CPU registers, for executing user programs
+    
+    int pageArray[NumPhysPages]; // Stores the pid of the owner of the page
 
 
 // NOTE: the hardware translation of virtual addresses in the user program

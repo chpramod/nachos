@@ -296,6 +296,7 @@ Machine::PageFaultHandler(int vaddr){
     offset = vaddr%PageSize;
     entry = &pageTable[vpn];
     entry->physicalPage = numPagesAllocated++;
+    machine->pageArray[entry->physicalPage] = currentThread->GetPID();
     entry->valid = TRUE;
     pageFrame = entry->physicalPage;
     executable->ReadAt(&(machine->mainMemory[pageFrame * PageSize]),
