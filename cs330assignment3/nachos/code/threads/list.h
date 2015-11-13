@@ -60,7 +60,7 @@ class List {
 
     void *GetMinPriorityThread (void);
 
-  private:
+  //private:
     ListElement *first;  	// Head of the list, NULL if list is empty
     ListElement *last;		// Last element of list
 };

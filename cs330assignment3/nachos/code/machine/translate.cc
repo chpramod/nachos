@@ -291,11 +291,19 @@ Machine::PageFaultHandler(int vaddr){
     if(executable==NULL){
         return FALSE;
     }
-    bzero(&machine->mainMemory[numPagesAllocated*PageSize], PageSize);
     vpn = vaddr/PageSize;
     offset = vaddr%PageSize;
     entry = &pageTable[vpn];
-    entry->physicalPage = numPagesAllocated++;
+    
+    if(machine->free_index<=0){
+        entry->physicalPage = numPagesAllocated++;
+    }
+    else{
+        machine->free_index--;
+        entry-> physicalPage = machine->freePages[machine->free_index];
+    }
+    DEBUG('z',"\t[%d %d]\n",entry->physicalPage, currentThread->GetPID());
+    bzero(&machine->mainMemory[entry->physicalPage*PageSize], PageSize);
     machine->pageArray[entry->physicalPage] = currentThread->GetPID();
     entry->valid = TRUE;
     pageFrame = entry->physicalPage;

@@ -135,26 +135,38 @@ AddrSpace::AddrSpace(AddrSpace *parentSpace)
 {
     numPages = parentSpace->GetNumPages();
     noffH = parentSpace->noffH;
-    unsigned i,j,validPages, sharedPages;
+    unsigned i,j,k,validPages, sharedPages,startAddrParent,startAddrChild;
 
     ASSERT(numPages+numPagesAllocated <= NumPhysPages);                // check we're not trying
                                                                                 // to run anything too big --
                                                                                 // at least until we have
                                                                                 // virtual memory
 
-    DEBUG('a', "Initializing address space, num pages %d, size %d\n",
+    DEBUG('z', "Initializing address space, num pages %d, size %d\n",
                                         numPages, numPages*PageSize);
     // first, set up the translation
     TranslationEntry* parentPageTable = parentSpace->GetPageTable();
     pageTable = new TranslationEntry[numPages];
-    for (i = 0, validPages=0, sharedPages = 0; i < numPages; i++) {
+    for (i = 0,j=0, validPages=0, sharedPages = 0; i < numPages; i++) {
         pageTable[i].virtualPage = i;
         if(parentPageTable[i].shared){
             pageTable[i].physicalPage = parentPageTable[i].physicalPage;
             sharedPages++;
         }
         else if(parentPageTable[i].valid){
-            pageTable[i].physicalPage = validPages+numPagesAllocated;
+            if(machine->free_index<=0){
+                pageTable[i].physicalPage = j+numPagesAllocated;
+                j++;
+            }
+            else {
+                machine->free_index--;
+                pageTable[i].physicalPage = machine->freePages[machine->free_index];
+                }
+            startAddrParent = parentPageTable[i].physicalPage*PageSize;
+            startAddrChild = pageTable[i].physicalPage*PageSize;
+            for(k=0;k<PageSize;k++){
+                machine->mainMemory[startAddrChild+k] = machine->mainMemory[startAddrParent+k];
+            }
             machine->pageArray[pageTable[i].physicalPage] = currentThread->GetPID();
             validPages++;
         }
@@ -167,46 +179,49 @@ AddrSpace::AddrSpace(AddrSpace *parentSpace)
                                         			// a separate page, we could set its
                                         			// pages to be read-only
     }
-
-    // Copy the contents
-    unsigned startAddrParent,startAddrChild;
-    for (i=0; i<numPages; i++) {
-        if(!pageTable[i].shared && pageTable[i].valid){
-            startAddrParent = parentPageTable[i].physicalPage*PageSize;
-            startAddrChild = pageTable[i].physicalPage*PageSize;
-            for(j=0;j<PageSize;j++){
-                machine->mainMemory[startAddrChild+j] = machine->mainMemory[startAddrParent+j];
-            }
-        }
-    }
-
+    
+    stats->numPageFaults += validPages;
     //numPagesAllocated += numPages;
-    numPagesAllocated += validPages;
+    numPagesAllocated += j;
 }
 
 int
 AddrSpace::ShmAllocate(int size){
-    int i, extraPages = (size+PageSize-1)/PageSize;
+    
+    int i,j, extraPages = (size+PageSize-1)/PageSize;
+    
+    ASSERT(extraPages+numPagesAllocated <= NumPhysPages);
+    
     TranslationEntry* oldPageTable = pageTable;
     pageTable = new TranslationEntry[numPages + extraPages];
     for (i = 0; i < numPages; i++) {
         pageTable[i] = oldPageTable[i];
     }
-    for (i = numPages; i < numPages + extraPages; i++){
+    for (i = numPages, j=0; i < numPages + extraPages; i++){
         pageTable[i].virtualPage = i;
-	pageTable[i].physicalPage = i-numPages+numPagesAllocated;
+        
+        if(machine->free_index<=0){
+            pageTable[i].physicalPage = j+numPagesAllocated;
+            j++;
+        }
+        else {
+            machine->free_index--;
+            pageTable[i].physicalPage = machine->freePages[machine->free_index];
+        }
         machine->pageArray[pageTable[i].physicalPage] = currentThread->GetPID();
 	pageTable[i].valid = TRUE;
 	pageTable[i].use = FALSE;
 	pageTable[i].dirty = FALSE;
 	pageTable[i].readOnly = FALSE;
         pageTable[i].shared = TRUE;
+        bzero(&machine->mainMemory[pageTable[i].physicalPage*PageSize], PageSize);
+        DEBUG('z',"\t\t\t\t[SHM %d]\n",machine->pageArray[pageTable[i].physicalPage]);
     }
     
-    bzero(&machine->mainMemory[numPagesAllocated*PageSize], extraPages*PageSize);
+    
     
     numPages += extraPages;
-    numPagesAllocated += extraPages;
+    numPagesAllocated += j;
     stats->numPageFaults += extraPages;
     delete oldPageTable;
     machine->pageTable = pageTable;
@@ -224,6 +239,8 @@ AddrSpace::~AddrSpace()
     for (int i = 0; i < numPages; i++){
         if(pageTable[i].valid && !pageTable[i].shared){
             machine->pageArray[pageTable[i].physicalPage] = -1; // Page marked as free
+            machine->freePages[machine->free_index] = pageTable[i].physicalPage;
+            machine->free_index++;
             DEBUG('z',"\t\t\t[%d]\n",pageTable[i].physicalPage);
         }
     }
